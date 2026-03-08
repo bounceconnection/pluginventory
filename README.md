@@ -7,7 +7,7 @@
 ## Features
 
 - **Automatic Plugin Discovery** — Scans standard macOS audio plugin directories and reads bundle metadata (CFBundleIdentifier, version, vendor)
-- **Update Detection** — Queries the Homebrew Formulae API to find newer versions of your installed plugins
+- **Update Detection** — Find newer versions of your installed plugins upon each scan
 - **Format Support** — VST3, Audio Unit (AU), and CLAP plugin formats
 - **Sortable Columns** — Sort by name, vendor, format, installed version, or available version to quickly find plugins that need updating
 - **Sidebar Filtering** — Filter by format (VST3, AU, CLAP) or show only plugins with updates available
