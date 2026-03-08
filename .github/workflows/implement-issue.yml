@@ -2,7 +2,7 @@ name: Implement Issue
 
 on:
   issues:
-    types: [opened, labeled]
+    types: [labeled]
   issue_comment:
     types: [created]
 
