@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  distribution.xml — Installer distribution definition for Plugin Updater
+  Used by productbuild to create the final .pkg installer.
+-->
+<installer-gui-script minSpecVersion="2">
+
+    <title>Plugin Updater</title>
+    <welcome    file="welcome.html"    mime-type="text/html"/>
+    <license    file="license.html"    mime-type="text/html"/>
+    <conclusion file="conclusion.html" mime-type="text/html"/>
+
+    <!-- Require macOS 14.0 (Sonoma) or later -->
+    <os-version min="14.0"/>
+
+    <!-- Only allow installation on the system volume -->
+    <domains enable_localSystem="true"/>
+
+    <!-- Allow the user to choose the destination -->
+    <options customize="never" rootVolumeOnly="true" require-scripts="false"/>
+
+    <choices-outline>
+        <line choice="com.tomioueda.PluginUpdater.choice"/>
+    </choices-outline>
+
+    <choice
+        id="com.tomioueda.PluginUpdater.choice"
+        visible="false"
+        title="Plugin Updater"
+        description="Installs Plugin Updater into /Applications.">
+        <pkg-ref id="com.tomioueda.PluginUpdater"/>
+    </choice>
+
+    <pkg-ref id="com.tomioueda.PluginUpdater"
+             version="0"
+             onConclusion="none">PluginUpdater-component.pkg</pkg-ref>
+
+</installer-gui-script>
