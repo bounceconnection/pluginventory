@@ -11,6 +11,7 @@ final class AppState {
     var scanProgress: Double = 0
     var errorMessage: String?
     var manifestEntries: [String: UpdateManifestEntry] = [:]
+    var updatesAvailableCount = 0
 
     private(set) var modelContainer: ModelContainer
     private var fileMonitor: FileSystemMonitor?
@@ -60,6 +61,12 @@ final class AppState {
         for (bundleID, entry) in updates {
             manifestEntries[bundleID] = entry
         }
+
+        // Count plugins with available updates
+        updatesAvailableCount = plugins.filter { plugin in
+            guard let entry = manifestEntries[plugin.bundleIdentifier] else { return false }
+            return entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
+        }.count
     }
 
     // MARK: - Full Scan

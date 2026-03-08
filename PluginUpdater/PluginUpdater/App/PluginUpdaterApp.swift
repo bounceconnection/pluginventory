@@ -432,6 +432,11 @@ struct MenuBarPopoverView: View {
             Divider()
             Text("\(appState.totalPluginCount) plugins")
                 .font(.subheadline)
+            if appState.updatesAvailableCount > 0 {
+                Text("\(appState.updatesAvailableCount) updates available")
+                    .font(.subheadline)
+                    .foregroundStyle(.green)
+            }
             if let date = appState.lastScanDate {
                 Text("Last scan: \(date.formatted(.relative(presentation: .named)))")
                     .font(.caption)

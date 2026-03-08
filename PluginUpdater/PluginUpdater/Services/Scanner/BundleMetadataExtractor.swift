@@ -94,11 +94,26 @@ enum BundleMetadataExtractor {
     private static func extractAudioComponentName(from plist: NSDictionary) -> String? {
         // AU plugins store manufacturer info in AudioComponents array
         guard let components = plist["AudioComponents"] as? [[String: Any]],
-              let first = components.first,
-              let manufacturer = first["manufacturer"] as? String else {
+              let first = components.first else {
             return nil
         }
-        return manufacturer
+
+        // Prefer the "name" field which follows "Vendor: PluginName" convention
+        if let name = first["name"] as? String,
+           let colonRange = name.range(of: ":") {
+            let vendor = name[name.startIndex..<colonRange.lowerBound]
+                .trimmingCharacters(in: .whitespaces)
+            if !vendor.isEmpty {
+                return vendor
+            }
+        }
+
+        // Fall back to manufacturer, but skip short codes (e.g., "oDin", "appl")
+        if let manufacturer = first["manufacturer"] as? String, manufacturer.count > 4 {
+            return manufacturer
+        }
+
+        return nil
     }
 
     private static func extractDomainFromBundleID(_ bundleID: String) -> String? {
