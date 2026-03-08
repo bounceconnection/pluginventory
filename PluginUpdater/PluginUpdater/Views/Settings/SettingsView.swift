@@ -4,75 +4,39 @@ import ServiceManagement
 
 struct SettingsView: View {
     @Environment(AppState.self) private var appState
-    @Query private var scanLocations: [ScanLocation]
     @AppStorage(Constants.UserDefaultsKeys.notificationsEnabled) private var notificationsEnabled = true
     @AppStorage(Constants.UserDefaultsKeys.manifestURL) private var manifestURL = ""
+    @AppStorage(Constants.UserDefaultsKeys.scanFrequency) private var scanFrequencyMinutes = Constants.Defaults.scanFrequencyMinutes
     @State private var launchAtLogin = false
-    @State private var newPath = ""
-    @State private var newFormat: PluginFormat = .vst3
+
+    private let frequencyOptions: [(label: String, minutes: Int)] = [
+        ("Every 15 minutes", 15),
+        ("Every 30 minutes", 30),
+        ("Every hour", 60),
+        ("Every 2 hours", 120),
+        ("Every 6 hours", 360),
+        ("Manual only", 0),
+    ]
 
     var body: some View {
         TabView {
             // Scan Paths
-            Form {
-                Section("Default Scan Locations") {
-                    ForEach(scanLocations.filter(\.isDefault)) { location in
-                        HStack {
-                            Toggle(isOn: Binding(
-                                get: { location.isEnabled },
-                                set: { location.isEnabled = $0 }
-                            )) {
-                                HStack {
-                                    PluginFormatBadge(format: location.format)
-                                    Text(location.path)
-                                        .font(.caption.monospaced())
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Section("Custom Scan Locations") {
-                    ForEach(scanLocations.filter { !$0.isDefault }) { location in
-                        HStack {
-                            PluginFormatBadge(format: location.format)
-                            Text(location.path)
-                                .font(.caption.monospaced())
-                            Spacer()
-                            Button(role: .destructive) {
-                                if let context = location.modelContext {
-                                    context.delete(location)
-                                    try? context.save()
-                                }
-                            } label: {
-                                Image(systemName: "trash")
-                            }
-                            .buttonStyle(.borderless)
-                        }
-                    }
-                    HStack {
-                        Picker("Format", selection: $newFormat) {
-                            ForEach(PluginFormat.allCases) { format in
-                                Text(format.displayName).tag(format)
-                            }
-                        }
-                        .frame(width: 100)
-                        TextField("Path", text: $newPath)
-                            .font(.caption.monospaced())
-                        Button("Add") {
-                            guard !newPath.isEmpty else { return }
-                            let location = ScanLocation(path: newPath, format: newFormat)
-                            appState.modelContainer.mainContext.insert(location)
-                            try? appState.modelContainer.mainContext.save()
-                            newPath = ""
-                        }
-                    }
-                }
-            }
-            .tabItem { Label("Scan Paths", systemImage: "folder.badge.gearshape") }
+            ScanPathsEditor()
+                .tabItem { Label("Scan Paths", systemImage: "folder.badge.gearshape") }
 
             // General
             Form {
+                Section("Scanning") {
+                    Picker("Auto-scan interval", selection: $scanFrequencyMinutes) {
+                        ForEach(frequencyOptions, id: \.minutes) { option in
+                            Text(option.label).tag(option.minutes)
+                        }
+                    }
+                    .onChange(of: scanFrequencyMinutes) { _, newValue in
+                        appState.updateAutoScanInterval(minutes: newValue)
+                    }
+                }
+
                 Section("Notifications") {
                     Toggle("Enable notifications for plugin changes", isOn: $notificationsEnabled)
                 }

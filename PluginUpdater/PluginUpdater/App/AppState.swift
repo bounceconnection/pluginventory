@@ -15,6 +15,7 @@ final class AppState {
 
     private(set) var modelContainer: ModelContainer
     private var fileMonitor: FileSystemMonitor?
+    private var autoScanTimer: Timer?
     private var isScanInProgress = false
     private let manifestManager = ManifestManager()
     private let versionChecker = VersionChecker()
@@ -191,6 +192,29 @@ final class AppState {
     func stopMonitoring() {
         fileMonitor?.stopMonitoring()
         fileMonitor = nil
+    }
+
+    // MARK: - Auto-Scan Timer
+
+    func startAutoScanTimer() {
+        let minutes = UserDefaults.standard.integer(forKey: Constants.UserDefaultsKeys.scanFrequency)
+        let interval = minutes > 0 ? minutes : Constants.Defaults.scanFrequencyMinutes
+        updateAutoScanInterval(minutes: interval)
+    }
+
+    func updateAutoScanInterval(minutes: Int) {
+        autoScanTimer?.invalidate()
+        autoScanTimer = nil
+
+        guard minutes > 0 else { return }
+
+        let interval = TimeInterval(minutes * 60)
+        autoScanTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            Task { @MainActor in
+                await self.performScan()
+            }
+        }
     }
 
     // MARK: - Private

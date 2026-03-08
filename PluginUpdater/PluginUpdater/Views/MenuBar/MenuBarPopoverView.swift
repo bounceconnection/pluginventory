@@ -9,13 +9,19 @@ struct MenuBarPopoverView: View {
             Text("Plugin Updater")
                 .font(.headline)
             Divider()
-            Text("\(appState.totalPluginCount) plugins")
-                .font(.subheadline)
-            if appState.updatesAvailableCount > 0 {
-                Text("\(appState.updatesAvailableCount) updates available")
+
+            // Stats
+            HStack {
+                Label("\(appState.totalPluginCount) plugins", systemImage: "puzzlepiece.extension")
                     .font(.subheadline)
-                    .foregroundStyle(.green)
+                Spacer()
+                if appState.updatesAvailableCount > 0 {
+                    Text("\(appState.updatesAvailableCount) updates")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.green)
+                }
             }
+
             if let date = appState.lastScanDate {
                 Text("Last scan: \(date.formatted(.relative(presentation: .named)))")
                     .font(.caption)
@@ -25,31 +31,61 @@ struct MenuBarPopoverView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+
             if appState.isScanning {
                 ProgressView(value: appState.scanProgress)
                     .controlSize(.small)
             }
+
+            // Recent changes
             if !appState.recentChanges.isEmpty {
                 Divider()
+                Text("Recent Changes")
+                    .font(.caption.bold())
+                    .foregroundStyle(.secondary)
                 ForEach(appState.recentChanges.prefix(5), id: \.self) { change in
                     Text(change)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
             }
+
             Divider()
-            Button(appState.isScanning ? "Scanning..." : "Scan Now") {
+
+            // Actions
+            Button {
                 Task { await appState.performScan() }
+            } label: {
+                Label(appState.isScanning ? "Scanning…" : "Scan Now", systemImage: "arrow.clockwise")
             }
             .disabled(appState.isScanning)
-            Button("Open Dashboard") {
+
+            Button {
+                Task { await appState.checkForUpdates() }
+            } label: {
+                Label("Check for Updates", systemImage: "arrow.triangle.2.circlepath")
+            }
+            .disabled(appState.isScanning)
+
+            Button {
                 NSApp.activate()
                 if let window = NSApp.windows.first(where: { $0.canBecomeMain }) {
                     window.makeKeyAndOrderFront(nil)
                 }
+            } label: {
+                Label("Open Dashboard", systemImage: "macwindow")
+            }
+
+            Divider()
+
+            Button {
+                NSApp.terminate(nil)
+            } label: {
+                Label("Quit Plugin Updater", systemImage: "power")
             }
         }
         .padding()
-        .frame(width: 250)
+        .frame(width: 260)
     }
 }

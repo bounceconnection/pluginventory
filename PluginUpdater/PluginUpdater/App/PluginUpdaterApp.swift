@@ -58,5 +58,8 @@ struct PluginUpdaterApp: App {
         // Load manifest + scan
         await appState.loadManifest()
         await appState.performScan()
+
+        // Start auto-scan timer
+        appState.startAutoScanTimer()
     }
 }
