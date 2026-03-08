@@ -142,15 +142,12 @@ actor VendorURLResolver {
             return cached
         }
 
-        // Validate with HEAD request (try www first, then bare domain)
-        let url = "https://www.\(candidate)"
-        var validated = await validateURL(url)
-        if validated == nil {
-            validated = await validateURL("https://\(candidate)")
-        }
+        // Validate via DNS resolution (no HTTP — avoids ATS/TLS issues entirely)
+        let resolved = Self.dnsResolves(candidate)
 
-        domainCache[candidate] = validated
-        return validated
+        let result: String? = resolved ? "https://www.\(candidate)" : nil
+        domainCache[candidate] = result
+        return result
     }
 
     /// Checks if a string is a valid DNS label (no underscores, not all digits, reasonable length).
@@ -163,54 +160,19 @@ actor VendorURLResolver {
         return label.unicodeScalars.allSatisfy({ allowed.contains($0) })
     }
 
-    /// Sends a HEAD request to check if a URL is reachable (follows redirects).
-    /// Uses a lenient TLS session and short timeout to avoid blocking on bad certs or slow hosts.
-    private func validateURL(_ urlString: String) async -> String? {
-        guard let url = URL(string: urlString) else { return nil }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "HEAD"
-        request.timeoutInterval = 3
-
-        do {
-            let (_, response) = try await Self.lenientSession.data(for: request)
-            guard let http = response as? HTTPURLResponse else { return nil }
-
-            // Accept success and redirects
-            if (200..<400).contains(http.statusCode) {
-                // Return the final URL after redirects
-                if let finalURL = http.url?.absoluteString {
-                    return finalURL
-                }
-                return urlString
-            }
-        } catch {
-            // Network error — URL not reachable
+    /// Checks if a hostname has DNS records using POSIX getaddrinfo.
+    /// Fast (~1-50ms), no HTTP connection, no ATS/TLS issues.
+    nonisolated private static func dnsResolves(_ hostname: String) -> Bool {
+        var hints = addrinfo()
+        hints.ai_family = AF_UNSPEC
+        hints.ai_socktype = SOCK_STREAM
+        var result: UnsafeMutablePointer<addrinfo>?
+        let status = getaddrinfo(hostname, nil, &hints, &result)
+        if status == 0 {
+            freeaddrinfo(result)
+            return true
         }
-        return nil
-    }
-
-    /// URLSession that accepts all server certificates for HEAD-check purposes.
-    /// We only use this to confirm a domain exists — not for transferring sensitive data.
-    private static let lenientSession: URLSession = {
-        let config = URLSessionConfiguration.ephemeral
-        config.timeoutIntervalForRequest = 3
-        config.timeoutIntervalForResource = 5
-        config.requestCachePolicy = .reloadIgnoringLocalCacheData
-        return URLSession(configuration: config, delegate: LenientTLSDelegate(), delegateQueue: nil)
-    }()
-
-    private final class LenientTLSDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
-        func urlSession(
-            _ session: URLSession,
-            didReceive challenge: URLAuthenticationChallenge
-        ) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
-            if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-               let trust = challenge.protectionSpace.serverTrust {
-                return (.useCredential, URLCredential(trust: trust))
-            }
-            return (.performDefaultHandling, nil)
-        }
+        return false
     }
 
     // MARK: - Strategy 4: Search Fallback

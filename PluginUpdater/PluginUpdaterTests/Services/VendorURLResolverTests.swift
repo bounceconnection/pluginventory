@@ -32,14 +32,14 @@ struct VendorURLResolverTests {
 
     // MARK: - Strategy 3: Reverse Domain
 
-    @Test("Resolves fabfilter.com via reverse domain")
+    @Test("Resolves fabfilter.com via DNS reverse domain")
     func reverseDomainFabFilter() async {
         let resolver = VendorURLResolver()
         let url = await resolver.resolve(
             bundleID: "com.fabfilter.Pro-Q.3",
             vendorName: "FabFilter"
         )
-        // Should resolve to fabfilter.com (HEAD validated)
+        // fabfilter.com has DNS records, should resolve
         #expect(url != nil)
         if let url {
             #expect(url.contains("fabfilter"))
@@ -75,12 +75,11 @@ struct VendorURLResolverTests {
         #expect(url == nil)
     }
 
-    // MARK: - Deduplication
+    // MARK: - Domain Validation
 
     @Test("Skips generic domains like apple")
     func skipsGenericDomains() async {
         let resolver = VendorURLResolver()
-        // "apple" is in the skip list, should not try apple.com
         let url = await resolver.resolve(
             bundleID: "com.apple.audio.plugin",
             vendorName: "Apple"
@@ -89,5 +88,63 @@ struct VendorURLResolverTests {
         if let url {
             #expect(url.contains("google.com/search") || url.contains("apple"))
         }
+    }
+
+    @Test("Skips invalid TLDs like kontakt")
+    func skipsInvalidTLDs() async {
+        let resolver = VendorURLResolver()
+        let url = await resolver.resolve(
+            bundleID: "kontakt.musicdevice.plugin",
+            vendorName: "Unknown"
+        )
+        // Invalid TLD — should not attempt DNS, returns nil
+        #expect(url == nil)
+    }
+
+    @Test("Skips domains with underscores")
+    func skipsUnderscoreDomains() async {
+        let resolver = VendorURLResolver()
+        let url = await resolver.resolve(
+            bundleID: "com.inear_display.plugin",
+            vendorName: "Unknown"
+        )
+        // Underscore in domain label is invalid DNS
+        #expect(url == nil)
+    }
+
+    @Test("Skips domains with spaces")
+    func skipsDomainWithSpaces() async {
+        let resolver = VendorURLResolver()
+        let url = await resolver.resolve(
+            bundleID: "com.Plugin Alliance.plugin",
+            vendorName: "Unknown"
+        )
+        #expect(url == nil)
+    }
+
+    @Test("Resolves valid .de domain via DNS")
+    func resolvesDeDomain() async {
+        let resolver = VendorURLResolver()
+        let url = await resolver.resolve(
+            bundleID: "de.cableguys.plugin",
+            vendorName: "Cableguys"
+        )
+        // cableguys.de has DNS records
+        #expect(url != nil)
+        if let url {
+            #expect(url.contains("cableguys"))
+        }
+    }
+
+    @Test("Plist strategy takes priority over reverse domain")
+    func plistPriorityOverDomain() async {
+        let resolver = VendorURLResolver()
+        let url = await resolver.resolve(
+            bundleID: "com.fabfilter.plugin",
+            plistFields: ["vendorurl": "https://custom-site.example.com/"],
+            vendorName: "FabFilter"
+        )
+        // Plist URL should win over reverse domain
+        #expect(url == "https://custom-site.example.com/")
     }
 }
