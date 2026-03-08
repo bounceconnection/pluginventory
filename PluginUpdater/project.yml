@@ -13,9 +13,11 @@ targets:
     sources:
       - path: PluginUpdater
         excludes:
-          - Resources
-    resources:
+          - "Resources/**"
       - path: PluginUpdater/Resources
+        buildPhase: resources
+    entitlements:
+      path: PluginUpdater/PluginUpdater.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.tomioueda.PluginUpdater
@@ -25,9 +27,12 @@ targets:
         SWIFT_VERSION: "5.9"
         MACOSX_DEPLOYMENT_TARGET: "14.0"
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.music"
+        INFOPLIST_KEY_CFBundleDisplayName: "Plugin Updater"
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.utilities"
         INFOPLIST_KEY_LSUIElement: NO
         ENABLE_HARDENED_RUNTIME: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
 
   PluginUpdaterTests:
     type: bundle.unit-test

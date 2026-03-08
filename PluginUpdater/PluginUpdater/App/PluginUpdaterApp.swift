@@ -67,6 +67,22 @@ struct PluginUpdaterApp: App {
 enum SidebarFilter: Hashable {
     case all
     case format(PluginFormat)
+    case updatesAvailable
+}
+
+/// Wraps a Plugin with its computed update status so the Table can sort all columns.
+struct PluginRow: Identifiable {
+    let plugin: Plugin
+    let availableVersion: String
+    let hasUpdate: Bool
+
+    var id: PersistentIdentifier { plugin.id }
+    var name: String { plugin.name }
+    var vendorName: String { plugin.vendorName }
+    var formatRawValue: String { plugin.format.rawValue }
+    var currentVersion: String { plugin.currentVersion }
+    /// 2 = update available, 1 = up to date, 0 = no data. Descending sort puts updates first.
+    var updatePriority: Int { hasUpdate ? 2 : (availableVersion == "—" ? 0 : 1) }
 }
 
 struct DashboardView: View {
@@ -74,22 +90,58 @@ struct DashboardView: View {
     @Query(filter: #Predicate<Plugin> { !$0.isRemoved }) private var plugins: [Plugin]
     @State private var sidebarSelection: SidebarFilter = .all
     @State private var searchText = ""
-    @State private var sortOrder = [KeyPathComparator(\Plugin.name)]
+    @State private var sortOrder = [KeyPathComparator(\PluginRow.name)]
     @State private var selectedPluginID: PersistentIdentifier?
     @State private var showInspector = false
 
-    private var filteredPlugins: [Plugin] {
+    private var filteredRows: [PluginRow] {
         var result = plugins
-        if case .format(let format) = sidebarSelection {
+
+        switch sidebarSelection {
+        case .all:
+            break
+        case .format(let format):
             result = result.filter { $0.format == format }
+        case .updatesAvailable:
+            result = result.filter { plugin in
+                guard let entry = appState.manifestEntries[plugin.bundleIdentifier] else { return false }
+                return entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
+            }
         }
+
         if !searchText.isEmpty {
             result = result.filter {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
                 $0.vendorName.localizedCaseInsensitiveContains(searchText)
             }
         }
-        return result.sorted(using: sortOrder)
+
+        let rows = result.map { plugin -> PluginRow in
+            let manifest = appState.manifestEntries
+            if let entry = manifest[plugin.bundleIdentifier] {
+                let hasUpdate = entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
+                return PluginRow(plugin: plugin, availableVersion: entry.latestVersion, hasUpdate: hasUpdate)
+            }
+            return PluginRow(plugin: plugin, availableVersion: "—", hasUpdate: false)
+        }
+
+        return rows.sorted(using: sortOrder)
+    }
+
+    private var updatesCount: Int {
+        plugins.filter { plugin in
+            guard let entry = appState.manifestEntries[plugin.bundleIdentifier] else { return false }
+            return entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
+        }.count
+    }
+
+    private var statusSubtitle: String {
+        if let error = appState.errorMessage {
+            return error
+        } else if let date = appState.lastScanDate {
+            return "Last scan: \(date.formatted(.relative(presentation: .named)))"
+        }
+        return ""
     }
 
     private var selectedPlugin: Plugin? {
@@ -106,6 +158,11 @@ struct DashboardView: View {
             List(selection: $sidebarSelection) {
                 Label("All (\(plugins.count))", systemImage: "music.note.list")
                     .tag(SidebarFilter.all)
+                if updatesCount > 0 {
+                    Label("Updates Available (\(updatesCount))", systemImage: "arrow.up.circle.fill")
+                        .tag(SidebarFilter.updatesAvailable)
+                        .foregroundStyle(.green)
+                }
                 Section("Formats") {
                     ForEach(PluginFormat.allCases) { format in
                         Label("\(format.displayName) (\(pluginCount(for: format)))", systemImage: "puzzlepiece.extension")
@@ -115,69 +172,68 @@ struct DashboardView: View {
             }
             .navigationTitle("Plugins")
         } detail: {
-            Table(filteredPlugins, selection: $selectedPluginID, sortOrder: $sortOrder) {
-                TableColumn("Name", value: \.name) { plugin in
-                    Text(plugin.name)
+            Table(filteredRows, selection: $selectedPluginID, sortOrder: $sortOrder) {
+                TableColumn("Name", value: \PluginRow.name) { (row: PluginRow) in
+                    Text(row.name)
                 }
-                TableColumn("Vendor", value: \.vendorName) { plugin in
-                    Text(plugin.vendorName)
+                TableColumn("Vendor", value: \PluginRow.vendorName) { (row: PluginRow) in
+                    Text(row.vendorName)
                 }
-                TableColumn("Format", value: \.format.rawValue) { plugin in
-                    PluginFormatBadge(format: plugin.format)
+                TableColumn("Format", value: \PluginRow.formatRawValue) { (row: PluginRow) in
+                    PluginFormatBadge(format: row.plugin.format)
                 }
                 .width(min: 50, ideal: 60, max: 80)
-                TableColumn("Installed", value: \.currentVersion) { plugin in
-                    Text(plugin.currentVersion)
+                TableColumn("Installed", value: \PluginRow.currentVersion) { (row: PluginRow) in
+                    Text(row.currentVersion)
                         .monospacedDigit()
                 }
                 .width(min: 60, ideal: 80, max: 120)
-                TableColumn("Available") { (plugin: Plugin) in
+                TableColumn("Available", value: \PluginRow.updatePriority) { (row: PluginRow) in
                     AvailableVersionCell(
-                        bundleID: plugin.bundleIdentifier,
-                        installedVersion: plugin.currentVersion,
-                        manifest: appState.manifestEntries
+                        availableVersion: row.availableVersion,
+                        hasUpdate: row.hasUpdate
                     )
                 }
                 .width(min: 60, ideal: 80, max: 120)
             }
-            .searchable(text: $searchText, prompt: "Search plugins or vendors")
             .overlay {
                 if plugins.isEmpty && !appState.isScanning {
                     ContentUnavailableView("No Plugins Found", systemImage: "puzzlepiece.extension", description: Text("Run a scan to discover your audio plugins."))
-                } else if filteredPlugins.isEmpty && !searchText.isEmpty {
+                } else if filteredRows.isEmpty && !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showInspector.toggle()
-                    } label: {
-                        Label("Inspector", systemImage: "sidebar.trailing")
-                    }
-                }
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .principal) {
                     if appState.isScanning {
                         ProgressView(value: appState.scanProgress)
                             .progressViewStyle(.circular)
-                            .controlSize(.small)
+                            .controlSize(.regular)
                     } else {
                         Button {
                             Task { await appState.performScan() }
                         } label: {
                             Label("Scan Now", systemImage: "arrow.clockwise")
                         }
+                        .controlSize(.large)
                     }
                 }
-                ToolbarItem(placement: .status) {
-                    if let error = appState.errorMessage {
-                        Label(error, systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                    } else if let date = appState.lastScanDate {
-                        Text("Last scan: \(date.formatted(.relative(presentation: .named)))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                ToolbarItem(placement: .secondaryAction) {
+                    Text(statusSubtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    HStack(spacing: 8) {
+                        TextField("Search plugins or vendors", text: $searchText)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(minWidth: 180, idealWidth: 250)
+                        Button {
+                            showInspector.toggle()
+                        } label: {
+                            Label("Info", systemImage: "sidebar.trailing")
+                        }
+                        .labelStyle(.titleAndIcon)
                     }
                 }
             }
@@ -203,21 +259,19 @@ struct DashboardView: View {
 // MARK: - Available Version Cell
 
 struct AvailableVersionCell: View {
-    let bundleID: String
-    let installedVersion: String
-    let manifest: [String: UpdateManifestEntry]
+    let availableVersion: String
+    let hasUpdate: Bool
 
     var body: some View {
-        if let entry = manifest[bundleID] {
-            if entry.latestVersion.isNewerVersion(than: installedVersion) {
-                Text(entry.latestVersion)
-                    .monospacedDigit()
-                    .foregroundStyle(.green)
-            } else {
-                Text(entry.latestVersion)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
+        if hasUpdate {
+            Label(availableVersion, systemImage: "arrow.up.circle.fill")
+                .monospacedDigit()
+                .foregroundStyle(.green)
+                .symbolRenderingMode(.multicolor)
+        } else if availableVersion != "—" {
+            Text(availableVersion)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
         } else {
             Text("—")
                 .foregroundStyle(.tertiary)

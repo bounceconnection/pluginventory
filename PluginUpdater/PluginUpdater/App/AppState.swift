@@ -16,6 +16,7 @@ final class AppState {
     private var fileMonitor: FileSystemMonitor?
     private var isScanInProgress = false
     private let manifestManager = ManifestManager()
+    private let versionChecker = VersionChecker()
 
     init(modelContainer: ModelContainer) {
         self.modelContainer = modelContainer
@@ -33,6 +34,32 @@ final class AppState {
         }
 
         manifestEntries = await manifestManager.allEntries()
+
+        // Load cask mappings for automatic version checking
+        await versionChecker.loadMappings()
+    }
+
+    /// Checks for available updates via the Homebrew Formulae API
+    /// and merges results into manifestEntries.
+    func checkForUpdates() async {
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<Plugin>(
+            predicate: #Predicate { !$0.isRemoved }
+        )
+        guard let plugins = try? context.fetch(descriptor) else { return }
+
+        // Build lookup: bundleID -> installedVersion
+        var installed: [String: String] = [:]
+        for plugin in plugins {
+            installed[plugin.bundleIdentifier] = plugin.currentVersion
+        }
+
+        let updates = await versionChecker.checkForUpdates(installedPlugins: installed)
+
+        // Merge: Homebrew data overrides bundled manifest
+        for (bundleID, entry) in updates {
+            manifestEntries[bundleID] = entry
+        }
     }
 
     // MARK: - Full Scan
@@ -72,6 +99,9 @@ final class AppState {
             if lastScanDate != nil {
                 NotificationManager.shared.notifyChanges(result.changes)
             }
+
+            // Check for available updates via Homebrew API
+            await checkForUpdates()
 
             // Start monitoring after first successful scan
             startMonitoring(directories: directories)

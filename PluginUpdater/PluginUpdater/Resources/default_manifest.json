@@ -1,5 +1,1710 @@
 {
-  "version": 1,
-  "last_updated": "2024-01-01T00:00:00Z",
-  "entries": []
+  "entries" : [
+    {
+      "bundle_identifier" : "Guitar Rig 7.MusicDevice.component",
+      "latest_version" : "7.0.2"
+    },
+    {
+      "bundle_identifier" : "Guitar Rig 7.vst3",
+      "latest_version" : "7.0.2"
+    },
+    {
+      "bundle_identifier" : "Kontakt 7.MusicDevice.component",
+      "latest_version" : "7.10.9"
+    },
+    {
+      "bundle_identifier" : "Kontakt 7.vst3",
+      "latest_version" : "7.10.9"
+    },
+    {
+      "bundle_identifier" : "Kontakt.MusicDevice.component",
+      "latest_version" : "6.8.0 (R0)"
+    },
+    {
+      "bundle_identifier" : "Kontakt.vst3",
+      "latest_version" : "6.8.0 (R0)"
+    },
+    {
+      "bundle_identifier" : "Reaktor 6.MusicDevice.component",
+      "latest_version" : "6.5.0"
+    },
+    {
+      "bundle_identifier" : "Reaktor 6.vst3",
+      "latest_version" : "6.5.0"
+    },
+    {
+      "bundle_identifier" : "audio.inorganic.colorplay",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "ch.toguaudioline.talpha",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "ch.toguaudioline.talsampler",
+      "latest_version" : "4.5.6"
+    },
+    {
+      "bundle_identifier" : "com.112dB.RedlineReverb2",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.ALMCo.ALMDrum",
+      "latest_version" : "1.2.1"
+    },
+    {
+      "bundle_identifier" : "com.ALMCo.Almicon",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "com.ALMCo.DigiEcho",
+      "latest_version" : "1.1"
+    },
+    {
+      "bundle_identifier" : "com.ALMCo.Quaidra",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "com.ALMCo.TapeTech",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "com.AqeelAadamMusic.Ridgewalk",
+      "latest_version" : "1.1.3"
+    },
+    {
+      "bundle_identifier" : "com.AqeelAadamMusic.WeepingWall",
+      "latest_version" : "1.5.3"
+    },
+    {
+      "bundle_identifier" : "com.AudioThing.Speakers",
+      "latest_version" : "1.3.0"
+    },
+    {
+      "bundle_identifier" : "com.BABYAudio.Transit2",
+      "latest_version" : "2.2"
+    },
+    {
+      "bundle_identifier" : "com.BEATSURFING.MetalPlugin",
+      "latest_version" : "1.0.7"
+    },
+    {
+      "bundle_identifier" : "com.BEATSURFING.PhazzRandom",
+      "latest_version" : "1.2.2"
+    },
+    {
+      "bundle_identifier" : "com.Forever89.audiounit.Visco",
+      "latest_version" : "2.0.0"
+    },
+    {
+      "bundle_identifier" : "com.Forever89.vst3.Visco",
+      "latest_version" : "2.0.0"
+    },
+    {
+      "bundle_identifier" : "com.GForce.impOSCar3",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.Heavyocity.Vast",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.Inear_Display.Ephemere",
+      "latest_version" : "1.5.0"
+    },
+    {
+      "bundle_identifier" : "com.Kazrog.KClip3",
+      "latest_version" : "3.6.3"
+    },
+    {
+      "bundle_identifier" : "com.Kazrog.TrueIron",
+      "latest_version" : "1.4.0"
+    },
+    {
+      "bundle_identifier" : "com.Martinic.audiounit.AxChorus",
+      "latest_version" : "1.3.1"
+    },
+    {
+      "bundle_identifier" : "com.Martinic.vst3.AxChorus",
+      "latest_version" : "1.3.1"
+    },
+    {
+      "bundle_identifier" : "com.Minimal.cluster_delay",
+      "latest_version" : "1.3.0"
+    },
+    {
+      "bundle_identifier" : "com.Minimal.fuse_compressor",
+      "latest_version" : "1.3.0"
+    },
+    {
+      "bundle_identifier" : "com.Minimal.morph_eq",
+      "latest_version" : "1.2.0"
+    },
+    {
+      "bundle_identifier" : "com.Minimal.rift",
+      "latest_version" : "2.4.0"
+    },
+    {
+      "bundle_identifier" : "com.Minimal.squash",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.Photosounder.audiounit.SplineEQ",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.Plogue.chipsynth.SFC.VST3",
+      "latest_version" : "2119"
+    },
+    {
+      "bundle_identifier" : "com.Plugin Alliance.DoubleMSv2",
+      "latest_version" : "1.2.0"
+    },
+    {
+      "bundle_identifier" : "com.PotenzaDSP.Amigo",
+      "latest_version" : "2.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Albino3.component",
+      "latest_version" : "3.5.3"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Albino3Legend",
+      "latest_version" : "3.5.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.BIT2",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Blade2",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Blade2.component",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Blue3",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.BlueIII",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.DelGrain",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.DelSane",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.DelSane.component",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Go2-X.component",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Go2X",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.LowSane",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.MasterMagic",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.PowerChord",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Predator.component",
+      "latest_version" : "1.6.6"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Predator3",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.PredatorFX.component",
+      "latest_version" : "1.6.6"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Punch-BD",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Punch-BD.component",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Punch-BDMulti.component",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Punch2",
+      "latest_version" : "1.0.6"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Punch2Multi",
+      "latest_version" : "1.0.6"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Quad",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Quad.component",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RAW-Kick",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RAW-Kick.component",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RAW2",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RG",
+      "latest_version" : "1.6.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RG.component",
+      "latest_version" : "1.6.3"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-AMod",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-AMod.component",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Delay",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Delay.component",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Distort2",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Distort2.component",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-EQ",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-EQ.component",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-PAN",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-PAN.component",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Reverse",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Reverse.component",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Verb2",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RP-Verb2.component",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RevSane",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RoCoder",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.RoCoder.component",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.SubBoomBass2",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.SubBoomBass2.component",
+      "latest_version" : "1.0.4"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.SynFex",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.UniMagic",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Vecto",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.Vecto.component",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.WirePluck",
+      "latest_version" : "1.0.1"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.XY-Transfer",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.RPCX.XY-Transfer.component",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.SPCPlugins.ArcSyn",
+      "latest_version" : "4.0.3"
+    },
+    {
+      "bundle_identifier" : "com.SonicAcademy.Kick3",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.Soundtheory.audiounit.Gullfoss",
+      "latest_version" : "1.11.9"
+    },
+    {
+      "bundle_identifier" : "com.Soundtheory.audiounit.GullfossLive",
+      "latest_version" : "1.11.9"
+    },
+    {
+      "bundle_identifier" : "com.Soundtheory.audiounit.GullfossMaster",
+      "latest_version" : "1.11.9"
+    },
+    {
+      "bundle_identifier" : "com.UnfilteredAudio.BassMint",
+      "latest_version" : "1.1.7"
+    },
+    {
+      "bundle_identifier" : "com.UnfilteredAudio.Battalion",
+      "latest_version" : "1.0.7"
+    },
+    {
+      "bundle_identifier" : "com.UnfilteredAudio.Silo",
+      "latest_version" : "1.1.7"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaDelay",
+      "latest_version" : "3.0.5"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaFutureVerb",
+      "latest_version" : "1.0.0.8"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaPlate",
+      "latest_version" : "1.6.8"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaRoom",
+      "latest_version" : "1.6.8"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaShimmer",
+      "latest_version" : "1.3.0"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaSupermassive",
+      "latest_version" : "2.5.0"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaUberMod",
+      "latest_version" : "1.2.8"
+    },
+    {
+      "bundle_identifier" : "com.ValhallaDSP.ValhallaVintageVerb",
+      "latest_version" : "4.0.5"
+    },
+    {
+      "bundle_identifier" : "com.VoiceAssist.NoiseWorks",
+      "latest_version" : "1.0.10"
+    },
+    {
+      "bundle_identifier" : "com.WavesAudio.WaveShell1-AU.16.7.33",
+      "latest_version" : "16.7.33"
+    },
+    {
+      "bundle_identifier" : "com.WavesAudio.WaveShell1-VST3.16.7.33",
+      "latest_version" : "16.7.33"
+    },
+    {
+      "bundle_identifier" : "com._510k.Seqund",
+      "latest_version" : "1.5.6"
+    },
+    {
+      "bundle_identifier" : "com.adptr.MetricAB",
+      "latest_version" : "1.4.1"
+    },
+    {
+      "bundle_identifier" : "com.airwindows.all-windows",
+      "latest_version" : "1.2026.61"
+    },
+    {
+      "bundle_identifier" : "com.airwindows.consolidated",
+      "latest_version" : "1.2026.61"
+    },
+    {
+      "bundle_identifier" : "com.apple.videoapps.appleaes3audio",
+      "latest_version" : "3.0"
+    },
+    {
+      "bundle_identifier" : "com.audiomodern.riffer",
+      "latest_version" : "3.1.2"
+    },
+    {
+      "bundle_identifier" : "com.cwitec.TX16Wx",
+      "latest_version" : "3.6.0"
+    },
+    {
+      "bundle_identifier" : "com.d16group.devastor2",
+      "latest_version" : "2.3.2"
+    },
+    {
+      "bundle_identifier" : "com.d16group.drumazon2",
+      "latest_version" : "2.0.7"
+    },
+    {
+      "bundle_identifier" : "com.d16group.frontier",
+      "latest_version" : "1.2.2"
+    },
+    {
+      "bundle_identifier" : "com.d16group.lush2",
+      "latest_version" : "2.1.5"
+    },
+    {
+      "bundle_identifier" : "com.d16group.nepheton2",
+      "latest_version" : "2.0.3"
+    },
+    {
+      "bundle_identifier" : "com.d16group.phoscyon2",
+      "latest_version" : "2.1.0"
+    },
+    {
+      "bundle_identifier" : "com.d16group.sigmund2",
+      "latest_version" : "2.0.1"
+    },
+    {
+      "bundle_identifier" : "com.d16group.toraverb2",
+      "latest_version" : "2.2.2"
+    },
+    {
+      "bundle_identifier" : "com.deviousmachines.duck",
+      "latest_version" : "1.3.11"
+    },
+    {
+      "bundle_identifier" : "com.deviousmachines.infiltrator",
+      "latest_version" : "2.5.22"
+    },
+    {
+      "bundle_identifier" : "com.deviousmachines.pitchmonster",
+      "latest_version" : "1.3.14"
+    },
+    {
+      "bundle_identifier" : "com.digitalsuburban.Dexed",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.discodsp.corona",
+      "latest_version" : "6.4.0"
+    },
+    {
+      "bundle_identifier" : "com.eventide.BlackholeImmersive",
+      "latest_version" : "1.1.4"
+    },
+    {
+      "bundle_identifier" : "com.exciteaudio.vision4x",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Micro.AU.1",
+      "latest_version" : "1.26"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Micro.Vst3.1",
+      "latest_version" : "1.26"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.One.AU.3",
+      "latest_version" : "3.37"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.One.Vst3.3",
+      "latest_version" : "3.37"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-C.AU.2",
+      "latest_version" : "2.17"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-C.Vst3.2",
+      "latest_version" : "2.17"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-DS.AU.1",
+      "latest_version" : "1.21"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-DS.Vst3.1",
+      "latest_version" : "1.21"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-G.AU.1",
+      "latest_version" : "1.31"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-G.Vst3.1",
+      "latest_version" : "1.31"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-L.AU.2",
+      "latest_version" : "2.21"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-L.Vst3.2",
+      "latest_version" : "2.21"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-MB.AU.1",
+      "latest_version" : "1.28"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-MB.Vst3.1",
+      "latest_version" : "1.28"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-Q.AU.3",
+      "latest_version" : "3.23"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-Q.Vst3.3",
+      "latest_version" : "3.23"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-R.AU.2",
+      "latest_version" : "2.01"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Pro-R.Vst3.2",
+      "latest_version" : "2.01"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Saturn.AU.2",
+      "latest_version" : "2.08"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Saturn.Vst3.2",
+      "latest_version" : "2.08"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Simplon.AU.1",
+      "latest_version" : "1.36"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Simplon.Vst3.1",
+      "latest_version" : "1.36"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Timeless.AU.3",
+      "latest_version" : "3.05"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Timeless.Vst3.3",
+      "latest_version" : "3.05"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Twin.AU.3",
+      "latest_version" : "3.02"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Twin.Vst3.3",
+      "latest_version" : "3.02"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Volcano.AU.3",
+      "latest_version" : "3.04"
+    },
+    {
+      "bundle_identifier" : "com.fabfilter.Volcano.Vst3.3",
+      "latest_version" : "3.04"
+    },
+    {
+      "bundle_identifier" : "com.freakshow.DumpsterFire",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.freakshow.backmask",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.freakshow.dreameater",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.gforce.imposcar2.au_w",
+      "latest_version" : "2.0.3"
+    },
+    {
+      "bundle_identifier" : "com.gforce.imposcar2FX.au_w",
+      "latest_version" : "2.0.3"
+    },
+    {
+      "bundle_identifier" : "com.image-line.flstudio-audiounit",
+      "latest_version" : "1.5.0"
+    },
+    {
+      "bundle_identifier" : "com.imagiro.autochroma",
+      "latest_version" : "1.25.5"
+    },
+    {
+      "bundle_identifier" : "com.infinitedigits.amenbreak",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.inphonik.RYM2612",
+      "latest_version" : "1.0.6"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.3-Band EQ",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Bitcrush",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Channel Mixer",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Chorus",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Clipper",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Comb Filter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Compactor",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Compressor",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Delay",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Distortion",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Dual Delay",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Dynamics",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Ensemble",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Filter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Flanger",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Formant Filter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Frequency Shifter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Gain",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Gate",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Haas",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Ladder Filter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Limiter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Nonlinear Filter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Phase Distortion",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Phase Plant",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Phaser",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Pitch Shifter",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Resonator",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Reverb",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Reverser",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Ring Mod",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Shaper",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Stereo",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Tape Stop",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Trance Gate",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.kiloHearts.Transient Shaper",
+      "latest_version" : "2.4.5"
+    },
+    {
+      "bundle_identifier" : "com.klevgrand.Brusfri",
+      "latest_version" : "1.2.2"
+    },
+    {
+      "bundle_identifier" : "com.klevgrand.Haaze2",
+      "latest_version" : "2.1.1"
+    },
+    {
+      "bundle_identifier" : "com.klevgrand.Skaka",
+      "latest_version" : "1.2.0"
+    },
+    {
+      "bundle_identifier" : "com.korg.kc.er-1",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.korg.prophecy",
+      "latest_version" : "1.7.2"
+    },
+    {
+      "bundle_identifier" : "com.korg.trinity",
+      "latest_version" : "1.1.1"
+    },
+    {
+      "bundle_identifier" : "com.korg.triton",
+      "latest_version" : "1.4.3"
+    },
+    {
+      "bundle_identifier" : "com.korg.tritonex",
+      "latest_version" : "1.1.1"
+    },
+    {
+      "bundle_identifier" : "com.lese.codec",
+      "latest_version" : "2.0.4"
+    },
+    {
+      "bundle_identifier" : "com.lese.frahm",
+      "latest_version" : "1.2.1"
+    },
+    {
+      "bundle_identifier" : "com.lese.slice",
+      "latest_version" : "1.1.1"
+    },
+    {
+      "bundle_identifier" : "com.lese.sweep",
+      "latest_version" : "1.3.8"
+    },
+    {
+      "bundle_identifier" : "com.lese.transfer",
+      "latest_version" : "1.4.8"
+    },
+    {
+      "bundle_identifier" : "com.lhiaudio.st1b.vst3",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.lhiaudio.st4b.vst3",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.liquidsonics.SeventhHeaven_Professional",
+      "latest_version" : "1.5.8"
+    },
+    {
+      "bundle_identifier" : "com.liquidsonics.cinematic-rooms.professional",
+      "latest_version" : "1.3.9"
+    },
+    {
+      "bundle_identifier" : "com.lunacy.audio.beam",
+      "latest_version" : "1.4.3"
+    },
+    {
+      "bundle_identifier" : "com.lusid.buzzcut",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.madronalabs.aalto",
+      "latest_version" : "1.9.5"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MAGC",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MAnalyzer",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MAutoPitch",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MAutopan",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MBandPass",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MBitFun",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MCCGenerator",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MChannelMatrix",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MCharmVerb",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MComb",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MCompressor",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MConvolutionEZ",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MDelay",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MEqualizer",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MFlanger",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MFreeformPhase",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MFreqShifter",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MLoudnessAnalyzer",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MMetronome",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MNoiseGenerator",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MNotepad",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MOscillator",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MOscilloscope",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MPhaser",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MRatio",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MRatioMB",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MRecorder",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MRingModulator",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MSaturator",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MSpectralPan",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MStereoExpander",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MStereoScope",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MTremolo",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MTuner",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MTurboReverb",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MTurboReverbMB",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MUtility",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MVibrato",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MWaveFolder",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.meldaproduction.MWaveShaper",
+      "latest_version" : "17.07"
+    },
+    {
+      "bundle_identifier" : "com.modartt.Pianoteq8.AudioUnit",
+      "latest_version" : "8.4.0"
+    },
+    {
+      "bundle_identifier" : "com.modartt.Pianoteq8.VST3",
+      "latest_version" : "8.4.0"
+    },
+    {
+      "bundle_identifier" : "com.myCompany.product",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.myPhilspeiser.product",
+      "latest_version" : "1.4.1"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.MassiveX.component",
+      "latest_version" : "1.7.0"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.MassiveX.vst3",
+      "latest_version" : "1.7.0"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.RC24.component",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.RC24.vst3",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.RC48.component",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.RC48.vst3",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.TransientMaster.component",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.TransientMaster.vst3",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.XmasScream.component",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.XmasScream.vst3",
+      "latest_version" : "1.4.11"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.kontakt-8.component",
+      "latest_version" : "8.9.0"
+    },
+    {
+      "bundle_identifier" : "com.native-instruments.kontakt-8.vst3",
+      "latest_version" : "8.9.0"
+    },
+    {
+      "bundle_identifier" : "com.newfangledaudio.Generate",
+      "latest_version" : "1.6.9"
+    },
+    {
+      "bundle_identifier" : "com.newfangledaudio.invigorate",
+      "latest_version" : "1.3.10"
+    },
+    {
+      "bundle_identifier" : "com.nthnblair.HALO_3DPAN",
+      "latest_version" : "0.2.2"
+    },
+    {
+      "bundle_identifier" : "com.oeksound.soothe2",
+      "latest_version" : "1.3.2"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.blackboxanalogdesignhg2",
+      "latest_version" : "1.9.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.blackboxanalogdesignhg2ms",
+      "latest_version" : "1.3.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.bxcleansweepv2",
+      "latest_version" : "2.16.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.bxrockrackv3player",
+      "latest_version" : "3.9.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.bxsaturatorv2",
+      "latest_version" : "2.12.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.bxsolo",
+      "latest_version" : "1.16.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.bxsubfilter",
+      "latest_version" : "1.9.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.elysianiveaufilter",
+      "latest_version" : "1.16.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.shadowhillsclassamasteringcomp",
+      "latest_version" : "1.4.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.splfreeranger",
+      "latest_version" : "1.18.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.au.spliron",
+      "latest_version" : "1.6.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.blackboxanalogdesignhg2",
+      "latest_version" : "1.10.0"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.blackboxanalogdesignhg2ms",
+      "latest_version" : "1.4.0"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.bxcleansweepv2",
+      "latest_version" : "2.16.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.bxrefinement",
+      "latest_version" : "1.12.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.bxrockrackv3player",
+      "latest_version" : "3.9.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.bxsaturatorv2",
+      "latest_version" : "2.12.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.bxsolo",
+      "latest_version" : "1.16.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.bxsubfilter",
+      "latest_version" : "1.9.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.elysianiveaufilter",
+      "latest_version" : "1.16.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.shadowhillsclassamasteringcomp",
+      "latest_version" : "1.5.0"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.splfreeranger",
+      "latest_version" : "1.18.1"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.spliron",
+      "latest_version" : "1.7.0"
+    },
+    {
+      "bundle_identifier" : "com.plugin-alliance.vst3.spltransientdesignerplus",
+      "latest_version" : "1.11.0"
+    },
+    {
+      "bundle_identifier" : "com.pluginboutique.Scaler2",
+      "latest_version" : "2.7.3"
+    },
+    {
+      "bundle_identifier" : "com.pluginboutique.ScalerAudio2",
+      "latest_version" : "2.7.3"
+    },
+    {
+      "bundle_identifier" : "com.pluginboutique.ScalerControl2",
+      "latest_version" : "2.7.3"
+    },
+    {
+      "bundle_identifier" : "com.polyverse.gatekeeper",
+      "latest_version" : "1.3.13"
+    },
+    {
+      "bundle_identifier" : "com.pspaudioware.plugins.pspplugin",
+      "latest_version" : "2.10.6"
+    },
+    {
+      "bundle_identifier" : "com.softube.SaturationKnob_VST_AU_Protect_AU",
+      "latest_version" : "2.6.30 (b152163 31d4cc8a)"
+    },
+    {
+      "bundle_identifier" : "com.softube.SaturationKnob_VST_AU_Protect_VST3",
+      "latest_version" : "2.6.30 (b152163 31d4cc8a)"
+    },
+    {
+      "bundle_identifier" : "com.sonible.smartlimit",
+      "latest_version" : "1.1.4"
+    },
+    {
+      "bundle_identifier" : "com.sonible.truebalance",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.sonible.truelevel",
+      "latest_version" : "1.0.2"
+    },
+    {
+      "bundle_identifier" : "com.soniccharge.cycloneauvst110",
+      "latest_version" : "1.1.0"
+    },
+    {
+      "bundle_identifier" : "com.soniccharge.microtonicauvst320",
+      "latest_version" : "3.3.4"
+    },
+    {
+      "bundle_identifier" : "com.soniccharge.microtonicauvstmulti320",
+      "latest_version" : "3.3.4"
+    },
+    {
+      "bundle_identifier" : "com.soniccharge.synplantauvst.309",
+      "latest_version" : "2.0.2"
+    },
+    {
+      "bundle_identifier" : "com.sonosaurus.paulxstretch",
+      "latest_version" : "1.6.0"
+    },
+    {
+      "bundle_identifier" : "com.soundtoys.audiounit.EffectRack",
+      "latest_version" : "5.3.9.16828 Authorization: EffectRack"
+    },
+    {
+      "bundle_identifier" : "com.soundtoys.vst3.EffectRack",
+      "latest_version" : "5.3.9.16828 Authorization: EffectRack"
+    },
+    {
+      "bundle_identifier" : "com.spectrasonics.Amber",
+      "latest_version" : "3.0.2c"
+    },
+    {
+      "bundle_identifier" : "com.spectrasonics.AmberFX",
+      "latest_version" : "3.0.2c"
+    },
+    {
+      "bundle_identifier" : "com.temeculadsp.dp4",
+      "latest_version" : "0.1.0"
+    },
+    {
+      "bundle_identifier" : "com.temeculadsp.sst-206",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "com.theusualsuspects.JE8086",
+      "latest_version" : "2.1.4"
+    },
+    {
+      "bundle_identifier" : "com.theusualsuspects.NodalRed2x",
+      "latest_version" : "2.1.4"
+    },
+    {
+      "bundle_identifier" : "com.theusualsuspects.OsTIrus",
+      "latest_version" : "2.1.4"
+    },
+    {
+      "bundle_identifier" : "com.theusualsuspects.Osirus",
+      "latest_version" : "2.1.4"
+    },
+    {
+      "bundle_identifier" : "com.theusualsuspects.Vavra",
+      "latest_version" : "2.1.4"
+    },
+    {
+      "bundle_identifier" : "com.theusualsuspects.Xenia",
+      "latest_version" : "1.4.0"
+    },
+    {
+      "bundle_identifier" : "com.u-he.Diva.au",
+      "latest_version" : "V1.4.8"
+    },
+    {
+      "bundle_identifier" : "com.u-he.Diva.vst3",
+      "latest_version" : "V1.4.8"
+    },
+    {
+      "bundle_identifier" : "com.u-he.Hive.au",
+      "latest_version" : "V2.1.2"
+    },
+    {
+      "bundle_identifier" : "com.u-he.Hive.clap",
+      "latest_version" : "V2.1.2"
+    },
+    {
+      "bundle_identifier" : "com.u-he.Hive.vst3",
+      "latest_version" : "V2.1.2"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U373",
+      "latest_version" : "1.0.9"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U391",
+      "latest_version" : "1.0.7"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U393",
+      "latest_version" : "1.0.7"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U39B",
+      "latest_version" : "1.5.17"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U39N",
+      "latest_version" : "1.4.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U39R",
+      "latest_version" : "1.0.6"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U39V",
+      "latest_version" : "1.3.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U39X",
+      "latest_version" : "1.3.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U39Z",
+      "latest_version" : "1.3.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3A1",
+      "latest_version" : "1.0.15"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3A3",
+      "latest_version" : "1.0.15"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3AV",
+      "latest_version" : "1.0.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3AX",
+      "latest_version" : "1.0.15"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3AZ",
+      "latest_version" : "1.3.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3B1",
+      "latest_version" : "1.0.6"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3BD",
+      "latest_version" : "1.0.17"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3BK",
+      "latest_version" : "1.3.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3BM",
+      "latest_version" : "1.2.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3BO",
+      "latest_version" : "1.2.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3BP",
+      "latest_version" : "1.0.10"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3BW",
+      "latest_version" : "1.0.5"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3C4",
+      "latest_version" : "1.0.9"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.U3CC",
+      "latest_version" : "1.0.16"
+    },
+    {
+      "bundle_identifier" : "com.uaudio.effects.UI06",
+      "latest_version" : "1.0.16"
+    },
+    {
+      "bundle_identifier" : "com.unfilteredaudio.SilverBullet",
+      "latest_version" : "1.1.0"
+    },
+    {
+      "bundle_identifier" : "com.uvisoundsource.UVIWorkstation",
+      "latest_version" : "4.0.5"
+    },
+    {
+      "bundle_identifier" : "com.uvisoundsource.UVIWorkstationAU",
+      "latest_version" : "4.0.5"
+    },
+    {
+      "bundle_identifier" : "com.vcvrack.rack",
+      "latest_version" : "2.4.1"
+    },
+    {
+      "bundle_identifier" : "com.voxengo.audio-plugins.VST3.OVC128",
+      "latest_version" : "1.14"
+    },
+    {
+      "bundle_identifier" : "com.voxengo.audio-plugins.VST3.TubeAmp",
+      "latest_version" : "2.16"
+    },
+    {
+      "bundle_identifier" : "com.waproduction.instacomposer",
+      "latest_version" : "1.0.3"
+    },
+    {
+      "bundle_identifier" : "com.waveAlchemy.Magic7",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.wavesfactory.Trackspacer25",
+      "latest_version" : "2.5.10"
+    },
+    {
+      "bundle_identifier" : "com.wavosaur.RaveGenerator2",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "com.xfer.LFOTool.AU",
+      "latest_version" : "1.768"
+    },
+    {
+      "bundle_identifier" : "com.xfer.LFOTool.AUMFX",
+      "latest_version" : "1.768"
+    },
+    {
+      "bundle_identifier" : "com.xfer.nerve.AU",
+      "latest_version" : "1.22"
+    },
+    {
+      "bundle_identifier" : "com.xfer.nerve.VST3",
+      "latest_version" : "1.354"
+    },
+    {
+      "bundle_identifier" : "com.xfer.serum.AU",
+      "latest_version" : "1.368"
+    },
+    {
+      "bundle_identifier" : "com.xfer.serum.VST3",
+      "latest_version" : "1.368"
+    },
+    {
+      "bundle_identifier" : "com.xfer.serum2.AU",
+      "latest_version" : "2.0.24"
+    },
+    {
+      "bundle_identifier" : "com.xfer.serum2.VST3",
+      "latest_version" : "2.0.24"
+    },
+    {
+      "bundle_identifier" : "com.xlnaudio.ds10drumshaper",
+      "latest_version" : "1.3.6"
+    },
+    {
+      "bundle_identifier" : "com.xlnaudio.life",
+      "latest_version" : "1.2.3"
+    },
+    {
+      "bundle_identifier" : "com.xlnaudio.liferecorder",
+      "latest_version" : "1.2.0"
+    },
+    {
+      "bundle_identifier" : "com.xlnaudio.xo",
+      "latest_version" : "1.8.2"
+    },
+    {
+      "bundle_identifier" : "com.zplane.ElastiquePitchV2",
+      "latest_version" : "2.2.5"
+    },
+    {
+      "bundle_identifier" : "com.zplane.reTune",
+      "latest_version" : "1.3.0"
+    },
+    {
+      "bundle_identifier" : "com.zynaptiq.morph3ProVST3",
+      "latest_version" : "3.2.1"
+    },
+    {
+      "bundle_identifier" : "com.zynaptiq.morph3PromdVST3",
+      "latest_version" : "3.2.1"
+    },
+    {
+      "bundle_identifier" : "com.zynaptiq.pitchmapPLUGIN_FLAVOR",
+      "latest_version" : "1.9.2"
+    },
+    {
+      "bundle_identifier" : "de.cableguys.halftime",
+      "latest_version" : "1.1.8"
+    },
+    {
+      "bundle_identifier" : "de.cableguys.snapback",
+      "latest_version" : "1.1"
+    },
+    {
+      "bundle_identifier" : "de.fullbucket.audiounit.FB7999",
+      "latest_version" : "1.1.6"
+    },
+    {
+      "bundle_identifier" : "de.fullbucket.audiounit.Ragnarok2",
+      "latest_version" : "2.0.0"
+    },
+    {
+      "bundle_identifier" : "de.fullbucket.vst3.FB7999",
+      "latest_version" : "1.1.5"
+    },
+    {
+      "bundle_identifier" : "de.fullbucket.vst3.Ragnarok2",
+      "latest_version" : "2.0.0"
+    },
+    {
+      "bundle_identifier" : "engineering.noise.RV",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "engineering.noise.RV.au",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "engineering.noise.SIV",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "engineering.noise.SIV.au",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "engineering.noise.VIV",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "engineering.noise.VIV.au",
+      "latest_version" : "1.0.0"
+    },
+    {
+      "bundle_identifier" : "jp.co.korg.m1.vst3",
+      "latest_version" : "2.4.1"
+    },
+    {
+      "bundle_identifier" : "jp.co.korg.m1_au",
+      "latest_version" : "2.4.1"
+    },
+    {
+      "bundle_identifier" : "jp.co.korg.wavestation.vst3",
+      "latest_version" : "2.4.2"
+    },
+    {
+      "bundle_identifier" : "jp.co.korg.wavestation_au",
+      "latest_version" : "2.4.2"
+    },
+    {
+      "bundle_identifier" : "jp.co.roland.D50AuPlugin",
+      "latest_version" : "1.1.5"
+    },
+    {
+      "bundle_identifier" : "jp.co.roland.D50Vst",
+      "latest_version" : "1.1.5"
+    },
+    {
+      "bundle_identifier" : "jp.co.roland.PX00AuPlugin",
+      "latest_version" : "2.0.7"
+    },
+    {
+      "bundle_identifier" : "jp.co.roland.PX00Vst",
+      "latest_version" : "2.0.7"
+    },
+    {
+      "bundle_identifier" : "net.uvi.Shade",
+      "latest_version" : "1.2.5"
+    },
+    {
+      "bundle_identifier" : "org.aqeelaadamsound.ridgewalk",
+      "latest_version" : "1.1.3"
+    },
+    {
+      "bundle_identifier" : "org.aqeelaadamsound.weepingwall",
+      "latest_version" : "1.5.3"
+    },
+    {
+      "bundle_identifier" : "studio.kx.distrho.Cardinal",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "studio.kx.distrho.CardinalFX",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "studio.kx.distrho.CardinalSynth",
+      "latest_version" : "1.0"
+    },
+    {
+      "bundle_identifier" : "studio.kx.distrho.cardinal#fx",
+      "latest_version" : "0.24.4"
+    },
+    {
+      "bundle_identifier" : "studio.kx.distrho.cardinal#synth",
+      "latest_version" : "0.24.4"
+    }
+  ],
+  "last_updated" : "2026-03-08T00:25:40Z",
+  "version" : 1
 }
