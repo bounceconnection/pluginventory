@@ -18,7 +18,6 @@ disabled_rules:
   - trailing_comma
   - for_where
   - large_tuple
-  - empty_count
 
 opt_in_rules:
   - empty_count

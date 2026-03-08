@@ -22,6 +22,7 @@ struct PluginRow: Identifiable {
     var updatePriority: Int { hasUpdate ? 2 : (availableVersion == "—" ? 0 : 1) }
 }
 
+@MainActor
 struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Query(filter: #Predicate<Plugin> { !$0.isRemoved }) private var plugins: [Plugin]
