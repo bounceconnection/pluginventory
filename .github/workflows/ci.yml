@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        working-directory: PluginUpdater
+        run: swift build
+
+      - name: Run tests
+        working-directory: PluginUpdater
+        run: swift test
+
+      - name: SwiftLint
+        run: |
+          brew install swiftlint || true
+          swiftlint lint --config .swiftlint.yml --reporter github-actions-logging
