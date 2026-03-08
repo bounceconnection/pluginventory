@@ -1,6 +1,6 @@
 # Plugin Updater
 
-*Plugin Updater* scans all your installed audio plugins (VST3, AU, CLAP), tracks their versions, and automatically checks for available updates.
+a macOS app that scans all your installed audio plugins (VST3, AU, CLAP), tracks their versions, and automatically checks for available updates.
 
 ![Dashboard](screenshots/dashboard.png)
 
