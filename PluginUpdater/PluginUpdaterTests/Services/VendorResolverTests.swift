@@ -305,4 +305,120 @@ struct VendorResolverTests {
         )
         #expect(result == "TestVendor")
     }
+
+    // MARK: - Version-like string rejection
+
+    @Test("Version string in getInfoString falls through to bundle ID")
+    func versionStringGetInfoFallsThrough() {
+        let result = VendorResolver.resolve(
+            audioComponentName: nil,
+            copyright: nil,
+            getInfoString: "2.0.3",
+            bundleIDDomain: "gforce",
+            parentDirectory: "Components",
+            format: .au
+        )
+        #expect(result == "Gforce")
+    }
+
+    @Test("Version string in copyright returns nil")
+    func versionStringCopyrightReturnsNil() {
+        let result = VendorResolver.extractVendorFromCopyright("2.0.3")
+        #expect(result == nil)
+    }
+
+    @Test("Dotted version number returns nil")
+    func dottedVersionReturnsNil() {
+        #expect(VendorResolver.extractVendorFromCopyright("1.0") == nil)
+        #expect(VendorResolver.extractVendorFromCopyright("10.2.1") == nil)
+    }
+
+    @Test("Various version formats are rejected")
+    func variousVersionFormatsRejected() {
+        #expect(VendorResolver.extractVendorFromCopyright("3") == nil)
+        #expect(VendorResolver.extractVendorFromCopyright("1.0.0") == nil)
+        #expect(VendorResolver.extractVendorFromCopyright("2.0.3") == nil)
+        #expect(VendorResolver.extractVendorFromCopyright("10.12.4.1") == nil)
+        #expect(VendorResolver.extractVendorFromCopyright("0.9") == nil)
+    }
+
+    @Test("Version with copyright prefix is rejected")
+    func versionWithCopyrightPrefixRejected() {
+        // "© 2.0.3" → strip ©, strip nothing else → "2.0.3" → version-like → nil
+        #expect(VendorResolver.extractVendorFromCopyright("© 2.0.3") == nil)
+        #expect(VendorResolver.extractVendorFromCopyright("Copyright 1.0") == nil)
+    }
+
+    @Test("Version in both copyright and getInfoString falls through entirely")
+    func versionInBothFieldsFallsThrough() {
+        let result = VendorResolver.resolve(
+            audioComponentName: nil,
+            copyright: "2.0.3",
+            getInfoString: "2.0.3",
+            bundleIDDomain: "gforce",
+            parentDirectory: "Components",
+            format: .au
+        )
+        #expect(result == "Gforce")
+    }
+
+    @Test("Version in all fields falls through to parent directory")
+    func versionFallsThroughToParentDir() {
+        let result = VendorResolver.resolve(
+            audioComponentName: nil,
+            copyright: "1.5",
+            getInfoString: "1.5",
+            bundleIDDomain: nil,
+            parentDirectory: "Eventide",
+            format: .vst3
+        )
+        #expect(result == "Eventide")
+    }
+
+    @Test("Version in all fields with no fallback returns Unknown")
+    func versionWithNoFallbackReturnsUnknown() {
+        let result = VendorResolver.resolve(
+            audioComponentName: nil,
+            copyright: "3.0",
+            getInfoString: "3.0",
+            bundleIDDomain: nil,
+            parentDirectory: "Components",
+            format: .au
+        )
+        #expect(result == "Unknown")
+    }
+
+    @Test("Version-like string with text is NOT rejected")
+    func versionWithTextNotRejected() {
+        // These contain letters so should be treated as vendor names
+        #expect(VendorResolver.extractVendorFromCopyright("v2.0") != nil)
+        #expect(VendorResolver.extractVendorFromCopyright("1.0.0-beta") != nil)
+        #expect(VendorResolver.extractVendorFromCopyright("D16 Group") != nil)
+        #expect(VendorResolver.extractVendorFromCopyright("112dB") != nil)
+    }
+
+    @Test("Single digit is rejected")
+    func singleDigitRejected() {
+        #expect(VendorResolver.extractVendorFromCopyright("5") == nil)
+    }
+
+    @Test("Copyright with year and version-only vendor is rejected")
+    func copyrightYearThenVersionRejected() {
+        // "Copyright 2024 1.0.3" → strip copyright, strip year → "1.0.3" → version → nil
+        #expect(VendorResolver.extractVendorFromCopyright("Copyright 2024 1.0.3") == nil)
+    }
+
+    @Test("Real impOSCar2 scenario: version getInfoString falls through to bundle ID")
+    func impOSCar2Scenario() {
+        // impOSCar2 has: no copyright, no AU component, getInfoString="2.0.3", bundleID=com.gforce
+        let result = VendorResolver.resolve(
+            audioComponentName: nil,
+            copyright: nil,
+            getInfoString: "2.0.3",
+            bundleIDDomain: "gforce",
+            parentDirectory: "Components",
+            format: .au
+        )
+        #expect(result == "Gforce")
+    }
 }
