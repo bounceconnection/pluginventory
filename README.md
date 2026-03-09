@@ -34,7 +34,7 @@ a macOS app that scans all your installed audio plugins (VST3, AU, CLAP), tracks
 
 ### Download the Installer (easiest)
 
-Download the latest **`.pkg` installer** from the [Releases page](https://github.com/bounceconnection/plugin-updater/releases):
+Download the latest **`.pkg` installer** from the [Releases page](https://github.com/bounceconnection/plugin_updater/releases):
 
 1. Download `PluginUpdater-<version>.pkg`.
 2. Double-click the file to launch the macOS Installer.
@@ -46,8 +46,8 @@ Download the latest **`.pkg` installer** from the [Releases page](https://github
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/plugin-updater.git
-   cd plugin-updater/PluginUpdater
+   git clone https://github.com/bounceconnection/plugin_updater.git
+   cd plugin_updater/PluginUpdater
    ```
 
 2. Generate the Xcode project (requires [xcodegen](https://github.com/yonaskolb/XcodeGen)):
@@ -111,7 +111,7 @@ The cask mappings file (`Resources/cask_mappings.json`) can be extended to suppo
 ```
 PluginUpdater/
   App/
-    PluginUpdaterApp.swift    # App entry point, all views
+    PluginUpdaterApp.swift    # App entry point, window/menu bar setup
     AppState.swift            # Observable state, scan orchestration
   Models/                     # SwiftData models (Plugin, PluginVersion, ScanLocation, etc.)
                               # CPUArchitecture enum and display helpers
