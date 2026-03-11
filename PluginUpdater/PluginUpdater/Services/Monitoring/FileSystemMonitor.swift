@@ -39,11 +39,15 @@ final class FileSystemMonitor {
             FSEventsGetCurrentEventId(),
             0, // no built-in latency — we debounce ourselves
             UInt32(kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagUseCFTypes)
-        ) else { return }
+        ) else {
+            AppLogger.shared.error("FSEvents stream creation failed — monitoring inactive", category: "monitor")
+            return
+        }
 
         self.stream = stream
         FSEventStreamSetDispatchQueue(stream, queue)
         FSEventStreamStart(stream)
+        AppLogger.shared.info("FSEvents monitoring started for \(directories.count) paths", category: "monitor")
     }
 
     func stopMonitoring() {
@@ -83,6 +87,8 @@ final class FileSystemMonitor {
             guard let self, !self.pendingDirectories.isEmpty else { return }
             let dirs = self.pendingDirectories.map { URL(fileURLWithPath: $0) }
             self.pendingDirectories.removeAll()
+
+            AppLogger.shared.info("FSEvents triggered incremental scan", category: "monitor")
 
             DispatchQueue.main.async { [weak self] in
                 self?.onDirectoriesChanged?(dirs)

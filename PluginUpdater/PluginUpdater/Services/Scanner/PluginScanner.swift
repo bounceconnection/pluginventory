@@ -81,6 +81,10 @@ actor PluginScanner {
                         case .success(let metadata):
                             plugins.append(metadata)
                         case .failure(let error):
+                            AppLogger.shared.error(
+                                "Could not read plugin at \(error.url.lastPathComponent): \(error.message)",
+                                category: "scan"
+                            )
                             errors.append(error)
                         }
                     }
@@ -103,6 +107,10 @@ actor PluginScanner {
                 case .success(let metadata):
                     plugins.append(metadata)
                 case .failure(let error):
+                    AppLogger.shared.error(
+                        "Could not read plugin at \(error.url.lastPathComponent): \(error.message)",
+                        category: "scan"
+                    )
                     errors.append(error)
                 }
             }

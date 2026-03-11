@@ -70,6 +70,13 @@ struct MenuBarPopoverView: View {
                 Label("Open Dashboard", systemImage: "macwindow")
             }
 
+            Button("Open Logs Folder") {
+                NSWorkspace.shared.open(AppLogger.shared.logsDirectoryURL)
+            }
+            .buttonStyle(.plain)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
             Divider()
 
             Button {

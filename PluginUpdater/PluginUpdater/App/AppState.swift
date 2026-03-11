@@ -62,6 +62,8 @@ final class AppState {
             installed[plugin.bundleIdentifier] = plugin.currentVersion
         }
 
+        AppLogger.shared.info("Update check started for \(installed.count) plugins", category: "updates")
+
         let updates = await versionChecker.checkForUpdates(installedPlugins: installed)
 
         // Merge: Homebrew data overrides bundled manifest
@@ -77,6 +79,8 @@ final class AppState {
             guard let entry = manifestEntries[plugin.bundleIdentifier] else { return false }
             return entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
         }.count
+
+        AppLogger.shared.info("Update check complete — \(updatesAvailableCount) updates available", category: "updates")
     }
 
     /// Uses VendorURLResolver to find URLs for plugins without download links.
@@ -175,10 +179,13 @@ final class AppState {
 
             guard !directories.isEmpty else {
                 errorMessage = "No scan locations configured"
+                AppLogger.shared.error("Scan aborted — no scan locations configured", category: "scan")
                 isScanning = false
                 isScanInProgress = false
                 return
             }
+
+            AppLogger.shared.info("Scan started — \(directories.count) directories", category: "scan")
 
             // Scan for plugin bundles
             scanProgress = 0.2
@@ -211,7 +218,9 @@ final class AppState {
             // Start monitoring after first successful scan
             startMonitoring(directories: directories)
         } catch {
-            errorMessage = "Scan failed: \(error.localizedDescription)"
+            let msg = "Scan failed: \(error.localizedDescription)"
+            errorMessage = msg
+            AppLogger.shared.error(msg, category: "scan")
         }
 
         isScanning = false
@@ -350,8 +359,14 @@ final class AppState {
             }
         }
 
+        AppLogger.shared.info(
+            "Scan complete — \(totalPluginCount) plugins, \(errors.count) errors",
+            category: "scan"
+        )
+
         if !errors.isEmpty {
             errorMessage = "\(errors.count) plugin(s) could not be read"
+            AppLogger.shared.error("\(errors.count) plugin(s) could not be read", category: "scan")
         }
     }
 }
