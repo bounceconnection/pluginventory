@@ -7,10 +7,12 @@ actor VersionChecker {
     struct CaskMapping: Codable {
         let bundleIDPrefix: String
         let cask: String
+        let maxMajorVersion: Int?
 
         enum CodingKeys: String, CodingKey {
             case bundleIDPrefix = "bundle_id_prefix"
             case cask
+            case maxMajorVersion = "max_major_version"
         }
     }
 
@@ -75,6 +77,17 @@ actor VersionChecker {
             for await (cask, response) in group {
                 guard let response else { continue }
                 for plugin in caskToPlugins[cask] ?? [] {
+                    if let mapping = mappings.first(where: { plugin.bundleID.hasPrefix($0.bundleIDPrefix) }),
+                       let maxMajor = mapping.maxMajorVersion {
+                        let fetchedMajor = response.version.split(separator: ".").first.flatMap { Int($0) } ?? 0
+                        if fetchedMajor > maxMajor {
+                            AppLogger.shared.info(
+                                "Skipping update for \(plugin.bundleID) — cask version \(response.version) exceeds max_major_version \(maxMajor)",
+                                category: "updates"
+                            )
+                            continue
+                        }
+                    }
                     results[plugin.bundleID] = UpdateManifestEntry(
                         bundleIdentifier: plugin.bundleID,
                         latestVersion: response.version,
@@ -106,6 +119,10 @@ actor VersionChecker {
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return nil }
             return try JSONDecoder().decode(CaskAPIResponse.self, from: data)
         } catch {
+            AppLogger.shared.error(
+                "Homebrew API fetch failed for cask '\(cask)': \(error)",
+                category: "updates"
+            )
             return nil
         }
     }

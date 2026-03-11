@@ -4,9 +4,13 @@ import UserNotifications
 final class NotificationManager: @unchecked Sendable {
     static let shared = NotificationManager()
 
+    /// Whether we're running in a proper .app bundle (required for UNUserNotificationCenter)
+    private let hasBundleIdentifier = Bundle.main.bundleIdentifier != nil
+
     private init() {}
 
     func requestAuthorization() async -> Bool {
+        guard hasBundleIdentifier else { return false }
         do {
             return try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .sound])
@@ -57,6 +61,8 @@ final class NotificationManager: @unchecked Sendable {
     }
 
     private func send(title: String, body: String, identifier: String) {
+        guard hasBundleIdentifier else { return }
+
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
@@ -67,6 +73,15 @@ final class NotificationManager: @unchecked Sendable {
             content: content,
             trigger: nil
         )
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                AppLogger.shared.error(
+                    "Notification delivery failed: \(error.localizedDescription)",
+                    category: "notifications"
+                )
+            } else {
+                AppLogger.shared.info("Notification sent: \(title)", category: "notifications")
+            }
+        }
     }
 }

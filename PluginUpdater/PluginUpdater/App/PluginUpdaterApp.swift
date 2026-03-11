@@ -27,7 +27,7 @@ struct PluginUpdaterApp: App {
         }
         .modelContainer(modelContainer)
 
-        MenuBarExtra("Plugin Updater", image: Constants.AssetNames.menuBarIcon) {
+        MenuBarExtra("Plugin Updater", systemImage: "puzzlepiece.extension") {
             MenuBarPopoverView()
                 .environment(appState)
         }
@@ -53,6 +53,12 @@ struct PluginUpdaterApp: App {
                 }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
             }
+
+            CommandMenu("Help") {
+                Button("Open Logs Folder") {
+                    NSWorkspace.shared.open(AppLogger.shared.logsDirectoryURL)
+                }
+            }
         }
     }
 
@@ -70,6 +76,12 @@ struct PluginUpdaterApp: App {
 
     @MainActor
     private func initialSetup() async {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        AppLogger.shared.info(
+            "App started — version \(appVersion), macOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
+            category: "startup"
+        )
+
         // Seed scan locations
         do {
             try PersistenceController.seedDefaultScanLocations(in: modelContainer.mainContext)

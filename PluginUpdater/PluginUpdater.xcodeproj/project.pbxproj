@@ -41,6 +41,7 @@
 		B49D299B461F137CCE71320E /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AD453D9B6930C4A3717BED /* NotificationManager.swift */; };
 		B6220976895AFAD7563D0C4F /* URLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE6380DB266015098CA2F47 /* URLExtensionTests.swift */; };
 		BB685A85A17B33B5B7F744F2 /* String+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443F8EF8565B79D25D4658BE /* String+Version.swift */; };
+		BD97DA43C9B1536C8035B73E /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567E1F6ED699C9EAFA295ED1 /* AppLogger.swift */; };
 		C226CFE3B3914AF892FB57AA /* ScanLocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDFCF45CB9FA3E07DE63CF5 /* ScanLocationTests.swift */; };
 		C234C97DC03FF1364B11692C /* VersionCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C419BEFFE80A25F8F0CCC4E2 /* VersionCheckerTests.swift */; };
 		C3C4D4DD4EDB0D265BF124A2 /* PluginFormatBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DFB4D8B2C016D078A49A68 /* PluginFormatBadge.swift */; };
@@ -97,6 +98,7 @@
 		50B2F733E2F4A6FA4BFC9282 /* PluginFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginFormat.swift; sourceTree = "<group>"; };
 		54993856C5106C87AEBC386E /* PluginHideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginHideTests.swift; sourceTree = "<group>"; };
 		5642C14BB4CA023226BC86AA /* AssetNamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetNamesTests.swift; sourceTree = "<group>"; };
+		567E1F6ED699C9EAFA295ED1 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5C11DF638C0C66FA77CD533E /* AvailableVersionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableVersionCell.swift; sourceTree = "<group>"; };
 		5C33FFFC7417CE4C6FC7FF12 /* PluginImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginImageService.swift; sourceTree = "<group>"; };
 		5CE6380DB266015098CA2F47 /* URLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensionTests.swift; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 		1CDDC4AD11EF6EA80F3AC6A0 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				567E1F6ED699C9EAFA295ED1 /* AppLogger.swift */,
 				3E9D30986AADC09D953814BE /* Constants.swift */,
 				503F3446C52399A51B4A3DE1 /* Extensions */,
 			);
@@ -489,6 +492,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD97DA43C9B1536C8035B73E /* AppLogger.swift in Sources */,
 				5EC118195278CECA9A597B86 /* AppState.swift in Sources */,
 				E1065AF7BEAEE6C7B28F1A6E /* ArchitectureDetector.swift in Sources */,
 				676BD62C9C7651D4D040103F /* AvailableVersionCell.swift in Sources */,
