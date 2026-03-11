@@ -51,8 +51,6 @@ private struct SidebarCounts {
 
 @MainActor
 struct DashboardView: View {
-    private static let appIcon = NSApp.applicationIconImage ?? NSImage()
-
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<Plugin> { !$0.isRemoved }) private var plugins: [Plugin]
@@ -63,6 +61,7 @@ struct DashboardView: View {
     @State private var sortOrder = [KeyPathComparator(\PluginRow.name)]
     @State private var selectedPluginIDs: Set<PersistentIdentifier> = []
     @State private var showInspector = false
+    @State private var appIcon: NSImage?
 
     // MARK: - Computed helpers
 
@@ -76,6 +75,7 @@ struct DashboardView: View {
                 c.visible += 1
                 c.formatCounts[plugin.format, default: 0] += 1
                 if let entry = manifest[plugin.bundleIdentifier],
+                   !entry.latestVersion.isEmpty,
                    entry.latestVersion.isNewerVersion(than: plugin.currentVersion) {
                     c.updates += 1
                 }
@@ -99,7 +99,8 @@ struct DashboardView: View {
                 result = result.filter { $0.format == format }
             case .updatesAvailable:
                 result = result.filter { plugin in
-                    guard let entry = manifest[plugin.bundleIdentifier] else { return false }
+                    guard let entry = manifest[plugin.bundleIdentifier],
+                          !entry.latestVersion.isEmpty else { return false }
                     return entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
                 }
             case .hidden:
@@ -116,8 +117,10 @@ struct DashboardView: View {
 
         let rows = result.map { plugin -> PluginRow in
             if let entry = manifest[plugin.bundleIdentifier] {
-                let hasUpdate = entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
-                return PluginRow(plugin: plugin, availableVersion: entry.latestVersion, hasUpdate: hasUpdate, downloadURL: entry.downloadURL)
+                let hasUpdate = !entry.latestVersion.isEmpty &&
+                    entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
+                let displayVersion = entry.latestVersion.isEmpty ? "—" : entry.latestVersion
+                return PluginRow(plugin: plugin, availableVersion: displayVersion, hasUpdate: hasUpdate, downloadURL: entry.downloadURL)
             }
             return PluginRow(plugin: plugin, availableVersion: "—", hasUpdate: false, downloadURL: nil)
         }
@@ -169,7 +172,8 @@ struct DashboardView: View {
                 "Size: \(ByteCountFormatter.string(fromByteCount: plugin.fileSize, countStyle: .file))",
                 "Path: \(plugin.path)",
             ]
-            if let entry = manifest[plugin.bundleIdentifier] {
+            if let entry = manifest[plugin.bundleIdentifier],
+               !entry.latestVersion.isEmpty {
                 lines.append("Available: \(entry.latestVersion)")
             }
             return lines.joined(separator: "\n")
@@ -237,11 +241,13 @@ struct DashboardView: View {
             }
             .navigationTitle("Plugins")
             .safeAreaInset(edge: .bottom) {
-                Image(nsImage: Self.appIcon)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .opacity(0.5)
-                    .padding(16)
+                if let appIcon {
+                    Image(nsImage: appIcon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .opacity(0.5)
+                        .padding(16)
+                }
             }
         } detail: {
             Table(rows, selection: $selectedPluginIDs, sortOrder: $sortOrder) {
@@ -417,5 +423,8 @@ struct DashboardView: View {
             }
         }
         .frame(minWidth: 700, minHeight: 400)
+        .task {
+            appIcon = NSApp.applicationIconImage
+        }
     }
 }

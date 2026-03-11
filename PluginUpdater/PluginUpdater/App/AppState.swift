@@ -76,7 +76,8 @@ final class AppState {
 
         // Count plugins with available updates
         updatesAvailableCount = plugins.filter { plugin in
-            guard let entry = manifestEntries[plugin.bundleIdentifier] else { return false }
+            guard let entry = manifestEntries[plugin.bundleIdentifier],
+                  !entry.latestVersion.isEmpty else { return false }
             return entry.latestVersion.isNewerVersion(than: plugin.currentVersion)
         }.count
 
@@ -142,17 +143,29 @@ final class AppState {
     }
 
     /// Applies a resolved vendor URL to all plugins sharing the same vendor prefix.
+    /// Only updates the download URL — does not create fake version entries.
     private func applyResolvedURL(_ prefix: String, bundleIDs: [String], url: String?) {
         guard let url else { return }
         for bundleID in bundleIDs {
-            let existingEntry = manifestEntries[bundleID]
-            manifestEntries[bundleID] = UpdateManifestEntry(
-                bundleIdentifier: bundleID,
-                latestVersion: existingEntry?.latestVersion ?? "0.0.0",
-                downloadURL: url,
-                releaseNotes: existingEntry?.releaseNotes,
-                releaseDate: existingEntry?.releaseDate
-            )
+            if let existing = manifestEntries[bundleID] {
+                // Update existing entry with the resolved URL
+                manifestEntries[bundleID] = UpdateManifestEntry(
+                    bundleIdentifier: bundleID,
+                    latestVersion: existing.latestVersion,
+                    downloadURL: url,
+                    releaseNotes: existing.releaseNotes,
+                    releaseDate: existing.releaseDate
+                )
+            } else {
+                // No version data — store URL-only entry so the Download column works
+                manifestEntries[bundleID] = UpdateManifestEntry(
+                    bundleIdentifier: bundleID,
+                    latestVersion: "",
+                    downloadURL: url,
+                    releaseNotes: nil,
+                    releaseDate: nil
+                )
+            }
         }
     }
 
