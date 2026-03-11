@@ -79,10 +79,13 @@ actor VersionChecker {
                 for plugin in caskToPlugins[cask] ?? [] {
                     if let mapping = mappings.first(where: { plugin.bundleID.hasPrefix($0.bundleIDPrefix) }),
                        let maxMajor = mapping.maxMajorVersion {
+                        let installedMajor = plugin.installed.split(separator: ".").first.flatMap { Int($0) } ?? 0
                         let fetchedMajor = response.version.split(separator: ".").first.flatMap { Int($0) } ?? 0
-                        if fetchedMajor > maxMajor {
+                        // Sunset plugin: installed major is at or below the cap,
+                        // and the cask now tracks a newer generation — skip.
+                        if installedMajor <= maxMajor && fetchedMajor > maxMajor {
                             AppLogger.shared.info(
-                                "Skipping update for \(plugin.bundleID) — cask version \(response.version) exceeds max_major_version \(maxMajor)",
+                                "Skipping update for \(plugin.bundleID) (v\(plugin.installed)) — cask version \(response.version) is a newer generation (max_major_version \(maxMajor))",
                                 category: "updates"
                             )
                             continue
