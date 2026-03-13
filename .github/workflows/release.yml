@@ -114,3 +114,22 @@ jobs:
           body_path: /tmp/release-body.md
           files: ${{ steps.pkg.outputs.PATH }}
           fail_on_unmatched_files: true
+
+  sync-dev:
+    name: Merge release tag back into dev
+    needs: build-pkg
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Merge main into dev
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git merge origin/main --no-edit
+          git push origin dev

@@ -56,6 +56,8 @@ xcodebuild archive \
     -scheme "$APP_NAME" \
     -configuration Release \
     -archivePath "$ARCHIVE_PATH" \
+    MARKETING_VERSION="$VERSION" \
+    CURRENT_PROJECT_VERSION="$VERSION" \
     CODE_SIGN_IDENTITY="" \
     CODE_SIGNING_REQUIRED=NO \
     CODE_SIGNING_ALLOWED=NO \

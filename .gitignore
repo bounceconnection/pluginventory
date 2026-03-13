@@ -15,5 +15,8 @@ DerivedData/
 # Build artifacts
 build/
 
+# Generated files
+PluginUpdater/PluginUpdater/Generated/
+
 # Claude
 .claude/

@@ -35,8 +35,12 @@ targets:
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
-    info:
-      path: PluginUpdater/Info.plist
+    preBuildScripts:
+      - name: Generate Version from Git
+        script: |
+          "${PROJECT_DIR}/../scripts/generate-version.sh"
+        outputFiles:
+          - $(SRCROOT)/PluginUpdater/Generated/AppVersion.swift
 
   PluginUpdaterTests:
     type: bundle.unit-test

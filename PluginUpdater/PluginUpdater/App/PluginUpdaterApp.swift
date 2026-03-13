@@ -39,6 +39,14 @@ struct PluginUpdaterApp: App {
         }
         .modelContainer(modelContainer)
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About Plugin Updater") {
+                    NSApp.orderFrontStandardAboutPanel(options: [
+                        .version: AppVersion.version,
+                        .applicationVersion: AppVersion.displayVersion,
+                    ])
+                }
+            }
             CommandGroup(after: .appInfo) {
                 Button("Scan & Check for Updates") {
                     Task { await appState.performScan() }
@@ -54,10 +62,11 @@ struct PluginUpdaterApp: App {
                 .keyboardShortcut("e", modifiers: [.command, .shift])
             }
 
-            CommandMenu("Help") {
+            CommandGroup(before: .help) {
                 Button("Open Logs Folder") {
                     NSWorkspace.shared.open(AppLogger.shared.logsDirectoryURL)
                 }
+                Divider()
             }
         }
     }
@@ -76,9 +85,8 @@ struct PluginUpdaterApp: App {
 
     @MainActor
     private func initialSetup() async {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         AppLogger.shared.info(
-            "App started — version \(appVersion), macOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
+            "App started — version \(AppVersion.displayVersion), macOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
             category: "startup"
         )
 

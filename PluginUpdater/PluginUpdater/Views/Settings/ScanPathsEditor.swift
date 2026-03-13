@@ -59,7 +59,7 @@ struct ScanPathsEditor: View {
                             Text(format.displayName).tag(format)
                         }
                     }
-                    .frame(width: 100)
+                    .frame(width: 140)
                     Button("Add Folder…") {
                         chooseFolder()
                     }

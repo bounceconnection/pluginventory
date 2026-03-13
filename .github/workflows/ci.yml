@@ -11,6 +11,11 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version
+        run: ./scripts/generate-version.sh
 
       - name: Build
         working-directory: PluginUpdater

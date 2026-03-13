@@ -304,6 +304,7 @@ struct DashboardView: View {
                 }
                 .width(min: 80, ideal: 100, max: 130)
             }
+            .background(NSTableViewFinder.enableColumnAutoResize())
             // Prevent SwiftUI from animating hundreds of row insertions/removals
             // when switching sidebar filters or clearing search text.
             .transaction { $0.disablesAnimations = true }
