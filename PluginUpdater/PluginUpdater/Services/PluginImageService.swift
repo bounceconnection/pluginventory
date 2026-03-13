@@ -14,6 +14,7 @@ actor PluginImageService {
     private var memoryCache: [String: NSImage] = [:]
     private var misses: Set<String> = []
     private var vendorURLOverrides: [VendorURLEntry] = []
+    private var inFlightKeys: [String: Task<NSImage?, Never>] = [:]
 
     private struct VendorURLEntry: Codable {
         let bundleIDPrefix: String
@@ -45,7 +46,36 @@ actor PluginImageService {
         vendorURLOverrides.first { bundleID.hasPrefix($0.bundleIDPrefix) }?.url
     }
 
+    /// Returns `true` if an image (or confirmed miss) is already cached for this plugin.
+    /// Checks memory cache, disk cache, and misses set — never triggers a fetch.
+    func hasCachedImage(pluginName: String, vendorName: String, bundleID: String) -> Bool {
+        let key = cacheKey(for: bundleID)
+        let shared = sharedCacheKey(name: pluginName, vendor: vendorName)
+
+        if memoryCache[key] != nil || memoryCache[shared] != nil { return true }
+        if misses.contains(shared) { return true }
+
+        let cacheFile = cacheDir.appendingPathComponent("\(key).png")
+        let sharedCacheFile = cacheDir.appendingPathComponent("\(shared).png")
+        let fm = FileManager.default
+        return fm.fileExists(atPath: cacheFile.path) || fm.fileExists(atPath: sharedCacheFile.path)
+    }
+
+    /// Clears all cached images (memory and disk) so they are re-fetched on next access.
+    func clearCache() {
+        memoryCache.removeAll()
+        misses.removeAll()
+        inFlightKeys.removeAll()
+        if let files = try? FileManager.default.contentsOfDirectory(at: cacheDir, includingPropertiesForKeys: nil) {
+            for file in files {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
+    }
+
     /// Returns a product image for the plugin, checking local bundle then web sources.
+    /// Images are shared across formats of the same plugin via a name+vendor shared key.
+    /// Deduplicates concurrent fetches for the same shared key.
     func image(
         pluginName: String,
         vendorName: String,
@@ -54,37 +84,58 @@ actor PluginImageService {
         vendorURL: String? = nil
     ) async -> NSImage? {
         let key = cacheKey(for: bundleID)
+        let shared = sharedCacheKey(name: pluginName, vendor: vendorName)
 
         if let cached = memoryCache[key] { return cached }
-        if misses.contains(key) { return nil }
+        if let cached = memoryCache[shared] {
+            memoryCache[key] = cached
+            return cached
+        }
+        if misses.contains(shared) { return nil }
 
-        // Disk cache
+        // Disk cache — check bundle-specific first, then shared
         let cacheFile = cacheDir.appendingPathComponent("\(key).png")
-        if let img = loadFromDisk(cacheFile) {
-            memoryCache[key] = img
-            return img
-        }
-
-        // Strategy 1 & 2: Local bundle images (with validation for Resources)
-        if let img = findLocalImage(pluginPath: pluginPath) {
-            return save(img, key: key, file: cacheFile)
-        }
-
-        // Strategy 3: OG image from vendor website
-        let resolvedVendorURL = vendorURL ?? vendorWebsiteURL(for: bundleID)
-        if let siteURL = resolvedVendorURL {
-            if let img = await fetchOGImage(from: siteURL) {
-                return save(img, key: key, file: cacheFile)
+        let sharedCacheFile = cacheDir.appendingPathComponent("\(shared).png")
+        for file in [cacheFile, sharedCacheFile] {
+            if let img = loadFromDisk(file) {
+                memoryCache[key] = img
+                memoryCache[shared] = img
+                return img
             }
         }
 
-        // Strategy 4: Bing image search (prefers vendor domain product page images)
-        if let img = await webImageSearch(name: pluginName, vendor: vendorName, vendorURL: resolvedVendorURL) {
-            return save(img, key: key, file: cacheFile)
+        // In-flight dedup: if another caller is already fetching this shared key, await it
+        if let existing = inFlightKeys[shared] {
+            return await existing.value
         }
 
-        misses.insert(key)
-        return nil
+        let task = Task<NSImage?, Never> {
+            // Strategy 1 & 2: Local bundle images (with validation for Resources)
+            if let img = findLocalImage(pluginPath: pluginPath) {
+                return save(img, key: key, sharedKey: shared)
+            }
+
+            // Strategy 3: OG image from vendor website
+            let resolvedVendorURL = vendorURL ?? vendorWebsiteURL(for: bundleID)
+            if let siteURL = resolvedVendorURL {
+                if let img = await fetchOGImage(from: siteURL) {
+                    return save(img, key: key, sharedKey: shared)
+                }
+            }
+
+            // Strategy 4: Bing image search (prefers vendor domain product page images)
+            if let img = await webImageSearch(name: pluginName, vendor: vendorName, vendorURL: resolvedVendorURL) {
+                return save(img, key: key, sharedKey: shared)
+            }
+
+            misses.insert(shared)
+            return nil
+        }
+
+        inFlightKeys[shared] = task
+        let result = await task.value
+        inFlightKeys.removeValue(forKey: shared)
+        return result
     }
 
     // MARK: - Strategy 1 & 2: Local Bundle Images
@@ -182,8 +233,17 @@ actor PluginImageService {
         }
 
         // Extract og:image or twitter:image content
-        guard let imageURLString = extractOGImageURL(from: html),
-              let imageURL = URL(string: imageURLString, relativeTo: url)?.absoluteURL else {
+        guard var imageURLString = extractOGImageURL(from: html),
+              !imageURLString.isEmpty else {
+            return nil
+        }
+
+        // Upgrade HTTP to HTTPS to comply with App Transport Security
+        if imageURLString.hasPrefix("http://") {
+            imageURLString = "https://" + imageURLString.dropFirst(7)
+        }
+
+        guard let imageURL = URL(string: imageURLString, relativeTo: url)?.absoluteURL else {
             return nil
         }
 
@@ -337,17 +397,32 @@ actor PluginImageService {
             .replacingOccurrences(of: " ", with: "_")
     }
 
+    /// Shared key based on plugin name + vendor so different formats share the same image.
+    private func sharedCacheKey(name: String, vendor: String) -> String {
+        let raw = "\(vendor)_\(name)"
+        return raw.lowercased()
+            .replacingOccurrences(of: ".", with: "_")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: " ", with: "_")
+    }
+
     private nonisolated func loadFromDisk(_ file: URL) -> NSImage? {
         guard FileManager.default.fileExists(atPath: file.path) else { return nil }
         return NSImage(contentsOf: file)
     }
 
-    private func save(_ image: NSImage, key: String, file: URL) -> NSImage {
+    private func save(_ image: NSImage, key: String, sharedKey: String) -> NSImage {
         memoryCache[key] = image
+        memoryCache[sharedKey] = image
         if let tiff = image.tiffRepresentation,
            let bitmap = NSBitmapImageRep(data: tiff),
            let png = bitmap.representation(using: .png, properties: [:]) {
-            try? png.write(to: file)
+            let cacheFile = cacheDir.appendingPathComponent("\(key).png")
+            try? png.write(to: cacheFile)
+            let sharedFile = cacheDir.appendingPathComponent("\(sharedKey).png")
+            if !FileManager.default.fileExists(atPath: sharedFile.path) {
+                try? png.write(to: sharedFile)
+            }
         }
         return image
     }

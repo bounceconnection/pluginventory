@@ -61,7 +61,6 @@ struct DashboardView: View {
     @State private var sortOrder = [KeyPathComparator(\PluginRow.name)]
     @State private var selectedPluginIDs: Set<PersistentIdentifier> = []
     @State private var showInspector = false
-    @State private var appIcon: NSImage?
 
     // MARK: - Computed helpers
 
@@ -241,13 +240,11 @@ struct DashboardView: View {
             }
             .navigationTitle("Plugins")
             .safeAreaInset(edge: .bottom) {
-                if let appIcon {
-                    Image(nsImage: appIcon)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .opacity(0.5)
-                        .padding(16)
-                }
+                Image("BrandLogo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .opacity(0.5)
+                    .padding(16)
             }
         } detail: {
             Table(rows, selection: $selectedPluginIDs, sortOrder: $sortOrder) {
@@ -424,8 +421,5 @@ struct DashboardView: View {
             }
         }
         .frame(minWidth: 700, minHeight: 400)
-        .task {
-            appIcon = NSApp.applicationIconImage
-        }
     }
 }

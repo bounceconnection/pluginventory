@@ -20,6 +20,7 @@ final class AppState {
     private let manifestManager = ManifestManager()
     private let versionChecker = VersionChecker()
     private let vendorURLResolver = VendorURLResolver()
+    private var prefetchTask: Task<Void, Never>?
 
     /// Plist fields from most recent scan, keyed by bundleID.
     /// Used by VendorURLResolver for URL extraction from plist metadata.
@@ -183,6 +184,8 @@ final class AppState {
     func performScan() async {
         guard !isScanInProgress else { return }
         isScanInProgress = true
+        prefetchTask?.cancel()
+        prefetchTask = nil
         isScanning = true
         errorMessage = nil
         scanProgress = 0
@@ -227,6 +230,9 @@ final class AppState {
 
             // Check for available updates + resolve vendor URLs
             await checkForUpdates()
+
+            // Prefetch plugin images in the background
+            prefetchImages()
 
             // Start monitoring after first successful scan
             startMonitoring(directories: directories)
@@ -335,6 +341,89 @@ final class AppState {
             csv += "\(name),\(vendor),\(format),\(version),\(bundleID),\(path)\n"
         }
         return csv
+    }
+
+    // MARK: - Image Prefetching
+
+    /// Cancels any running image prefetch task.
+    func cancelImagePrefetch() {
+        prefetchTask?.cancel()
+        prefetchTask = nil
+    }
+
+    /// Warms the image cache in the background for all unique plugins.
+    private func prefetchImages() {
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<Plugin>(
+            predicate: #Predicate { !$0.isRemoved }
+        )
+        guard let plugins = try? context.fetch(descriptor) else { return }
+
+        // Copy plugin data into plain tuples (SwiftData objects aren't Sendable)
+        struct PluginInfo: Hashable {
+            let name: String
+            let vendor: String
+            let bundleID: String
+            let path: String
+            let vendorURL: String?
+            var sharedKey: String { "\(vendor.lowercased())_\(name.lowercased())" }
+        }
+
+        var seen = Set<String>()
+        var uniquePlugins: [PluginInfo] = []
+        for plugin in plugins {
+            let info = PluginInfo(
+                name: plugin.name,
+                vendor: plugin.vendorName,
+                bundleID: plugin.bundleIdentifier,
+                path: plugin.path,
+                vendorURL: manifestEntries[plugin.bundleIdentifier]?.downloadURL
+            )
+            if seen.insert(info.sharedKey).inserted {
+                uniquePlugins.append(info)
+            }
+        }
+
+        AppLogger.shared.info("Image prefetch starting for \(uniquePlugins.count) unique plugins", category: "images")
+
+        prefetchTask = Task.detached(priority: .utility) {
+            await withTaskGroup(of: Void.self) { group in
+                var inFlight = 0
+                for info in uniquePlugins {
+                    if Task.isCancelled { break }
+
+                    // Skip already-cached images
+                    let cached = await PluginImageService.shared.hasCachedImage(
+                        pluginName: info.name,
+                        vendorName: info.vendor,
+                        bundleID: info.bundleID
+                    )
+                    if cached { continue }
+
+                    if inFlight >= 3 {
+                        _ = await group.next()
+                        inFlight -= 1
+                    }
+
+                    group.addTask {
+                        _ = await PluginImageService.shared.image(
+                            pluginName: info.name,
+                            vendorName: info.vendor,
+                            bundleID: info.bundleID,
+                            pluginPath: info.path,
+                            vendorURL: info.vendorURL
+                        )
+                    }
+                    inFlight += 1
+                }
+            }
+
+            if !Task.isCancelled {
+                await MainActor.run {
+                    AppLogger.shared.info("Image prefetch complete", category: "images")
+                }
+            }
+        }
     }
 
     // MARK: - Private

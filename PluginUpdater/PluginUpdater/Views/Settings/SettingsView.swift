@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage(Constants.UserDefaultsKeys.manifestURL) private var manifestURL = ""
     @AppStorage(Constants.UserDefaultsKeys.scanFrequency) private var scanFrequencyMinutes = Constants.Defaults.scanFrequencyMinutes
     @State private var launchAtLogin = false
+    @State private var didClearImageCache = false
 
     private let frequencyOptions: [(label: String, minutes: Int)] = [
         ("Every 15 minutes", 15),
@@ -62,6 +63,23 @@ struct SettingsView: View {
                                 launchAtLogin = !enabled
                             }
                         }
+                }
+
+                Section("Cache") {
+                    HStack {
+                        Button(didClearImageCache ? "Image Cache Cleared" : "Clear Image Cache") {
+                            Task {
+                                appState.cancelImagePrefetch()
+                                await PluginImageService.shared.clearCache()
+                                didClearImageCache = true
+                            }
+                        }
+                        .disabled(didClearImageCache)
+                        Spacer()
+                        Text("Re-fetches plugin images on next load")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .tabItem { Label("General", systemImage: "gearshape") }
