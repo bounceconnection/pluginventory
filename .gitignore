@@ -18,5 +18,3 @@ build/
 # Generated files
 PluginUpdater/PluginUpdater/Generated/
 
-# Claude
-.claude/
