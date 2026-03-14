@@ -9,6 +9,7 @@ struct ScanPathsEditor: View {
 
     private var defaultLocations: [ScanLocation] {
         scanLocations.filter(\.isDefault)
+            .sorted { ($0.format.displayName, $0.path) < ($1.format.displayName, $1.path) }
     }
 
     private var customLocations: [ScanLocation] {

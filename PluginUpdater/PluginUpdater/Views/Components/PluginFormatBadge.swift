@@ -5,9 +5,10 @@ struct PluginFormatBadge: View {
 
     private var color: Color {
         switch format {
-        case .vst3: .blue
         case .au: .purple
         case .clap: .orange
+        case .vst2: .teal
+        case .vst3: .blue
         }
     }
 
