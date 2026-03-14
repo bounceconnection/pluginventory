@@ -18,3 +18,7 @@ build/
 # Generated files
 PluginUpdater/PluginUpdater/Generated/
 
+# Claude Code (per-user)
+.claude/settings.local.json
+.claude/skills/skills-workspace/
+
