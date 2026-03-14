@@ -39,21 +39,4 @@ enum PluginFormat: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var userDirectory: URL {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        switch self {
-        case .au:
-            return home.appendingPathComponent("Library/Audio/Plug-Ins/Components")
-        case .clap:
-            return home.appendingPathComponent("Library/Audio/Plug-Ins/CLAP")
-        case .vst2:
-            return home.appendingPathComponent("Library/Audio/Plug-Ins/VST")
-        case .vst3:
-            return home.appendingPathComponent("Library/Audio/Plug-Ins/VST3")
-        }
-    }
-
-    var allDirectories: [URL] {
-        [systemDirectory, userDirectory]
-    }
 }

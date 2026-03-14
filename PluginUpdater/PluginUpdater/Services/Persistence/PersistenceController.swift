@@ -68,5 +68,14 @@ enum PersistenceController {
             }
             try context.save()
         }
+
+        // Migration: remove ~/Library default locations (plugins are never installed there)
+        let userDefaults = existing.filter { $0.isDefault && $0.path.hasPrefix("~/") }
+        if !userDefaults.isEmpty {
+            for location in userDefaults {
+                context.delete(location)
+            }
+            try context.save()
+        }
     }
 }

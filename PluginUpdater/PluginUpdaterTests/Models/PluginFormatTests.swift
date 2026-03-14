@@ -29,28 +29,6 @@ struct PluginFormatTests {
         #expect(PluginFormat.vst3.systemDirectory.path == "/Library/Audio/Plug-Ins/VST3")
     }
 
-    @Test("User directories are under home")
-    func userDirectories() {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        for format in PluginFormat.allCases {
-            #expect(format.userDirectory.path.hasPrefix(home.path))
-        }
-        #expect(PluginFormat.au.userDirectory.path.hasSuffix("Library/Audio/Plug-Ins/Components"))
-        #expect(PluginFormat.clap.userDirectory.path.hasSuffix("Library/Audio/Plug-Ins/CLAP"))
-        #expect(PluginFormat.vst2.userDirectory.path.hasSuffix("Library/Audio/Plug-Ins/VST"))
-        #expect(PluginFormat.vst3.userDirectory.path.hasSuffix("Library/Audio/Plug-Ins/VST3"))
-    }
-
-    @Test("allDirectories returns both system and user")
-    func allDirectories() {
-        for format in PluginFormat.allCases {
-            let dirs = format.allDirectories
-            #expect(dirs.count == 2)
-            #expect(dirs[0] == format.systemDirectory)
-            #expect(dirs[1] == format.userDirectory)
-        }
-    }
-
     @Test("CaseIterable has all four formats")
     func allCases() {
         #expect(PluginFormat.allCases.count == 4)
