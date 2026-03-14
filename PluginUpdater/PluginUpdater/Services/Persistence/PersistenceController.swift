@@ -39,17 +39,34 @@ enum PersistenceController {
     static func seedDefaultScanLocations(in context: ModelContext) throws {
         let descriptor = FetchDescriptor<ScanLocation>()
         let existing = try context.fetch(descriptor)
-        guard existing.isEmpty else { return }
 
-        for location in Constants.defaultScanLocations {
-            let scanLocation = ScanLocation(
-                path: location.path,
-                format: location.format,
-                isDefault: true,
-                isEnabled: true
-            )
-            context.insert(scanLocation)
+        if existing.isEmpty {
+            for location in Constants.defaultScanLocations {
+                let scanLocation = ScanLocation(
+                    path: location.path,
+                    format: location.format,
+                    isDefault: true,
+                    isEnabled: true
+                )
+                context.insert(scanLocation)
+            }
+            try context.save()
+            return
         }
-        try context.save()
+
+        // Migration: add VST2 defaults for existing users
+        let hasVST2 = existing.contains { $0.format == .vst2 }
+        if !hasVST2 {
+            for location in Constants.defaultScanLocations where location.format == .vst2 {
+                let scanLocation = ScanLocation(
+                    path: location.path,
+                    format: location.format,
+                    isDefault: true,
+                    isEnabled: true
+                )
+                context.insert(scanLocation)
+            }
+            try context.save()
+        }
     }
 }

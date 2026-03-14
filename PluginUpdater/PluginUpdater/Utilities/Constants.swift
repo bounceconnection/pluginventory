@@ -30,11 +30,13 @@ enum Constants {
     }
 
     static let defaultScanLocations: [(path: String, format: PluginFormat)] = [
-        ("/Library/Audio/Plug-Ins/VST3", .vst3),
-        ("~/Library/Audio/Plug-Ins/VST3", .vst3),
         ("/Library/Audio/Plug-Ins/Components", .au),
         ("~/Library/Audio/Plug-Ins/Components", .au),
         ("/Library/Audio/Plug-Ins/CLAP", .clap),
         ("~/Library/Audio/Plug-Ins/CLAP", .clap),
+        ("/Library/Audio/Plug-Ins/VST", .vst2),
+        ("~/Library/Audio/Plug-Ins/VST", .vst2),
+        ("/Library/Audio/Plug-Ins/VST3", .vst3),
+        ("~/Library/Audio/Plug-Ins/VST3", .vst3),
     ]
 }
