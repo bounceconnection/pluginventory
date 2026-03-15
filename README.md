@@ -1,6 +1,6 @@
 # Pluginventory
 
-Your audio plugin library, organized. A native macOS app that catalogs every AU, CLAP, VST2, and VST3 plugin on your system, tracks version history, checks for updates, and shows you exactly which plugins each Ableton project depends on.
+A native macOS app that catalogs every AU, CLAP, VST2, and VST3 plugin on your system, tracks version history, checks for updates, and shows you exactly which plugins each Ableton project depends on.
 
 ![Dashboard](screenshots/dashboard.png)
 
@@ -15,16 +15,17 @@ Your audio plugin library, organized. A native macOS app that catalogs every AU,
 - **Detail inspector** — plugin image, version history, bundle ID, file path, architecture, download links
 
 ### Update Checking
-- **Homebrew Cask integration** — maps bundle IDs to Cask names and queries the Formulae API for latest versions
+- **Automatic version checking** — detects newer versions of your installed plugins and shows them in the Available column
 - **Manifest caching** — cached entries display instantly on launch, then refresh in the background
-- **Vendor URL resolution** — intelligently finds publisher websites via plist metadata, reverse-domain lookup, and web search fallback
-- **In-app update checker** — checks GitHub Releases for new Pluginventory versions
+- **Smart plugin identification** — intelligently finds publisher websites via plist metadata, reverse-domain lookup, and web search fallback
 
 ### Ableton Project Analysis
 - **Scans .als project files** to identify which plugins each project uses (AU, VST3, VST2)
 - **Missing plugin detection** — flags plugins referenced in projects but not installed on your system
 - **Live streaming scan** — projects appear in the table incrementally as they're parsed
 - **Project detail view** — plugins grouped by format with installed/missing status and instance counts
+
+![Ableton Project Scanner](screenshots/projects.png)
 
 ### Menu Bar & Monitoring
 - **Menu bar extra** — quick access popover showing plugin count, update count, recent changes, and scan controls
