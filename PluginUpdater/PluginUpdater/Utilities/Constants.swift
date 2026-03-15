@@ -22,6 +22,13 @@ enum Constants {
         static let scanProjectsOnLaunch = "scanProjectsOnLaunch"
         static let monitorProjectDirectories = "monitorProjectDirectories"
         static let debugVerboseLogging = "debugVerboseLogging"
+        static let checkForAppUpdates = "checkForAppUpdates"
+    }
+
+    enum AppUpdateConfig {
+        static let repoOwner = "bounceconnection"
+        static let repoName = "plugin_updater"
+        static let githubAPIBase = "https://api.github.com"
     }
 
     enum NotificationIdentifiers {

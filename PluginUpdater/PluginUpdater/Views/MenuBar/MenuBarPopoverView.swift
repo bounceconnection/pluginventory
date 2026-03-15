@@ -10,6 +10,24 @@ struct MenuBarPopoverView: View {
                 .font(.headline)
             Divider()
 
+            // App update banner
+            if let update = appState.availableAppUpdate {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.down.circle.fill")
+                        .foregroundStyle(.blue)
+                    Text("Update Available: v\(update.version)")
+                        .font(.subheadline.bold())
+                    Spacer()
+                    Button("View Release") {
+                        NSWorkspace.shared.open(update.releasePageURL)
+                    }
+                    .controlSize(.small)
+                }
+                .padding(8)
+                .background(.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 6))
+                Divider()
+            }
+
             // Stats
             HStack {
                 Label("\(appState.totalPluginCount) plugins", systemImage: "puzzlepiece.extension")
