@@ -9,7 +9,40 @@ actor ProjectReconciler {
         let newProjects: Int
         let updatedProjects: Int
         let removedProjects: Int
+        let skippedProjects: Int
         let totalProcessed: Int
+    }
+
+    // Cached state across batches — built once per scan, reused for every batch.
+    private var existingByPath: [String: AbletonProject]?
+    private var pluginIndex: PluginMatcher.PluginIndex?
+    private var matchCache: [AbletonProjectParser.ParsedPlugin: PluginMatcher.MatchResult] = [:]
+
+    /// Builds caches that persist across reconcile() calls within a scan.
+    /// Call once before the first batch.
+    func prepareForScan() throws {
+        let projectDescriptor = FetchDescriptor<AbletonProject>()
+        let existingProjects = try modelContext.fetch(projectDescriptor)
+        var byPath: [String: AbletonProject] = [:]
+        byPath.reserveCapacity(existingProjects.count)
+        for project in existingProjects {
+            byPath[project.filePath] = project
+        }
+        existingByPath = byPath
+
+        let pluginDescriptor = FetchDescriptor<Plugin>(
+            predicate: #Predicate { !$0.isRemoved }
+        )
+        let installedPlugins = try modelContext.fetch(pluginDescriptor)
+        pluginIndex = PluginMatcher.PluginIndex(plugins: installedPlugins)
+        matchCache = [:]
+    }
+
+    /// Clears cached state after a scan completes.
+    func finishScan() {
+        existingByPath = nil
+        pluginIndex = nil
+        matchCache = [:]
     }
 
     /// Reconciles parsed Ableton projects against the SwiftData store.
@@ -17,24 +50,20 @@ actor ProjectReconciler {
         parsedProjects: [AbletonProjectParser.ParsedProject],
         fullScan: Bool = true
     ) throws -> ReconciliationResult {
-        let descriptor = FetchDescriptor<AbletonProject>()
-        let existingProjects = try modelContext.fetch(descriptor)
-
-        var existingByPath: [String: AbletonProject] = [:]
-        for project in existingProjects {
-            existingByPath[project.filePath] = project
+        // Build caches on first call if prepareForScan() wasn't called
+        if existingByPath == nil || pluginIndex == nil {
+            try prepareForScan()
+        }
+        guard let existingByPath = existingByPath,
+              let pluginIndex = pluginIndex else {
+            // Should never happen after prepareForScan()
+            return ReconciliationResult(newProjects: 0, updatedProjects: 0, removedProjects: 0, skippedProjects: 0, totalProcessed: 0)
         }
 
-        let pluginDescriptor = FetchDescriptor<Plugin>(
-            predicate: #Predicate { !$0.isRemoved }
-        )
-        let installedPlugins = try modelContext.fetch(pluginDescriptor)
-        let pluginIndex = PluginMatcher.PluginIndex(plugins: installedPlugins)
-
-        var matchCache: [AbletonProjectParser.ParsedPlugin: PluginMatcher.MatchResult] = [:]
         var seenPaths: Set<String> = []
         var newCount = 0
         var updatedCount = 0
+        var skippedCount = 0
         var matchedCount = 0
         var unmatchedCount = 0
 
@@ -42,6 +71,13 @@ actor ProjectReconciler {
             seenPaths.insert(parsed.filePath)
 
             if let existing = existingByPath[parsed.filePath] {
+                // Skip unchanged projects — same lastModified means plugins haven't changed
+                if existing.lastModified == parsed.lastModified && !existing.isRemoved {
+                    existing.lastScannedDate = .now
+                    skippedCount += 1
+                    continue
+                }
+
                 existing.name = parsed.name
                 existing.lastModified = parsed.lastModified
                 existing.fileSize = parsed.fileSize
@@ -75,6 +111,8 @@ actor ProjectReconciler {
                     lastScannedDate: .now
                 )
                 modelContext.insert(project)
+                // Update the cache so subsequent batches see this project
+                self.existingByPath?[parsed.filePath] = project
 
                 for parsedPlugin in parsed.plugins {
                     let projectPlugin = createProjectPlugin(
@@ -92,8 +130,8 @@ actor ProjectReconciler {
 
         var removedCount = 0
         if fullScan {
-            for project in existingProjects
-                where !seenPaths.contains(project.filePath) && !project.isRemoved {
+            for (path, project) in existingByPath
+                where !seenPaths.contains(path) && !project.isRemoved {
                 project.isRemoved = true
                 removedCount += 1
             }
@@ -102,7 +140,7 @@ actor ProjectReconciler {
         try modelContext.save()
 
         AppLogger.shared.info(
-            "Reconciled \(parsedProjects.count) projects — \(matchedCount) matched, \(unmatchedCount) unmatched, \(newCount) new, \(updatedCount) updated, \(removedCount) removed",
+            "Reconciled \(parsedProjects.count) projects — \(matchedCount) matched, \(unmatchedCount) unmatched, \(newCount) new, \(updatedCount) updated, \(skippedCount) unchanged, \(removedCount) removed",
             category: "projectScan"
         )
 
@@ -110,6 +148,7 @@ actor ProjectReconciler {
             newProjects: newCount,
             updatedProjects: updatedCount,
             removedProjects: removedCount,
+            skippedProjects: skippedCount,
             totalProcessed: parsedProjects.count
         )
     }
@@ -143,8 +182,8 @@ actor ProjectReconciler {
             predicate: #Predicate { !$0.isRemoved }
         )
         let installedPlugins = try modelContext.fetch(pluginDescriptor)
-        let pluginIndex = PluginMatcher.PluginIndex(plugins: installedPlugins)
-        var matchCache: [AbletonProjectParser.ParsedPlugin: PluginMatcher.MatchResult] = [:]
+        let index = PluginMatcher.PluginIndex(plugins: installedPlugins)
+        var cache: [AbletonProjectParser.ParsedPlugin: PluginMatcher.MatchResult] = [:]
 
         for project in projects {
             for projectPlugin in project.plugins {
@@ -158,11 +197,11 @@ actor ProjectReconciler {
                     vendorName: projectPlugin.vendorName
                 )
                 let result: PluginMatcher.MatchResult
-                if let cached = matchCache[parsed] {
+                if let cached = cache[parsed] {
                     result = cached
                 } else {
-                    result = PluginMatcher.match(parsed, index: pluginIndex)
-                    matchCache[parsed] = result
+                    result = PluginMatcher.match(parsed, index: index)
+                    cache[parsed] = result
                 }
                 projectPlugin.isInstalled = result.isInstalled
                 projectPlugin.matchedPluginID = result.matchedPluginID
