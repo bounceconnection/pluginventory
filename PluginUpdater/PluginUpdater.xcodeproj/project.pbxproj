@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		001056A58D6A044FE878C816 /* CPUArchitecture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E9F0D88FC395A0E299CABE /* CPUArchitecture.swift */; };
 		002ED17C38422E0665BDA70C /* AbletonProjectScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF4EF4A1B1F491B5FCB2107 /* AbletonProjectScannerTests.swift */; };
+		070273722264C50F235A2BA7 /* ManifestCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021662C281B540A83F9D8B49 /* ManifestCacheManager.swift */; };
 		094A82A62070027682AB3EFC /* PluginMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C664FA0B7A7969EFAD0316E0 /* PluginMatcherTests.swift */; };
 		0A69C6CDB779E830D34E4E81 /* PluginHideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54993856C5106C87AEBC386E /* PluginHideTests.swift */; };
 		0C2B1176C0E94B366EEA9719 /* AppUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC140E85F6B430D9D28E88F /* AppUpdateChecker.swift */; };
@@ -82,6 +83,7 @@
 		F4E3F3721B3D4DC21F5B7618 /* UpdateManifestEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD735DCF3B89D813DB2D8CF /* UpdateManifestEntry.swift */; };
 		F65525A9AA9BCA5A0249F223 /* FileSystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6374A2122F3079A1BD7E318D /* FileSystemMonitor.swift */; };
 		F720A9F3DF5B4C2CB1F06D77 /* VersionChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF70C3C105617C5ED85FF7 /* VersionChecker.swift */; };
+		F8B665E14F555B5683A64EA3 /* ManifestCacheManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFAC665D40D58C619FF87ED /* ManifestCacheManagerTests.swift */; };
 		FA9F5B3B76F71F73DA81D765 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E455535FE74D6F17BDEBF9E /* SettingsView.swift */; };
 		FC5247E53239629726DAC9D6 /* AbletonProjectPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF560CA07A0EBF86AD46F17 /* AbletonProjectPlugin.swift */; };
 /* End PBXBuildFile section */
@@ -98,6 +100,7 @@
 
 /* Begin PBXFileReference section */
 		02063DE3C8D3333A309332EC /* PluginFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginFormatTests.swift; sourceTree = "<group>"; };
+		021662C281B540A83F9D8B49 /* ManifestCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestCacheManager.swift; sourceTree = "<group>"; };
 		058703EFBA8361D1A9CFE0E8 /* VendorURLResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorURLResolverTests.swift; sourceTree = "<group>"; };
 		0DC3971E9045D641781CF69E /* ScanPathsEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPathsEditor.swift; sourceTree = "<group>"; };
 		0F4C374ECB160B55AF5974F3 /* PersistenceControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceControllerTests.swift; sourceTree = "<group>"; };
@@ -133,6 +136,7 @@
 		68BBAABB4C7CF313F0C5E8E0 /* VendorLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorLink.swift; sourceTree = "<group>"; };
 		696F41E6C13E22B96BB66267 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		6BC8E0BFE748332634B82821 /* Plugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
+		6EFAC665D40D58C619FF87ED /* ManifestCacheManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestCacheManagerTests.swift; sourceTree = "<group>"; };
 		7260843A198DC8AF06D3BCDC /* ProjectDetailViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailViewTests.swift; sourceTree = "<group>"; };
 		77BFAC4857A07DF1A9660DB8 /* ProjectDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailView.swift; sourceTree = "<group>"; };
 		77DEF28C969390E7D1827F3D /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
@@ -260,6 +264,7 @@
 				F000674EA4300F88278E2F37 /* AppUpdateCheckerTests.swift */,
 				CB60DE5B1E64F45E37BD8A1C /* ArchitectureDetectorTests.swift */,
 				CBA6B4E9B3F58F0C720500CB /* BundleMetadataExtractorTests.swift */,
+				6EFAC665D40D58C619FF87ED /* ManifestCacheManagerTests.swift */,
 				0F4C374ECB160B55AF5974F3 /* PersistenceControllerTests.swift */,
 				C664FA0B7A7969EFAD0316E0 /* PluginMatcherTests.swift */,
 				7A598E6367944C87FE41AEE0 /* PluginReconcilerTests.swift */,
@@ -456,6 +461,7 @@
 			isa = PBXGroup;
 			children = (
 				2FC140E85F6B430D9D28E88F /* AppUpdateChecker.swift */,
+				021662C281B540A83F9D8B49 /* ManifestCacheManager.swift */,
 				AB464ABB49A24F29E6CF5654 /* ManifestManager.swift */,
 				CE00D48FF579CB2C859A32CF /* VendorURLResolver.swift */,
 				F5DF70C3C105617C5ED85FF7 /* VersionChecker.swift */,
@@ -604,6 +610,7 @@
 				ECA8707A7773A23B9E80059F /* Constants.swift in Sources */,
 				1AD3F653DF2ED4EE9DE9FA48 /* DashboardView.swift in Sources */,
 				F65525A9AA9BCA5A0249F223 /* FileSystemMonitor.swift in Sources */,
+				070273722264C50F235A2BA7 /* ManifestCacheManager.swift in Sources */,
 				7341AFB665F38EDA0DD89450 /* ManifestManager.swift in Sources */,
 				CD34817EAA390B6528E62B5D /* MenuBarPopoverView.swift in Sources */,
 				7E95577656352305F6537C11 /* NSTableViewFinder.swift in Sources */,
@@ -651,6 +658,7 @@
 				A4F965356550E03BE2D1254D /* AssetNamesTests.swift in Sources */,
 				F3C6BA58672FB61A3F52CA11 /* BundleMetadataExtractorTests.swift in Sources */,
 				4D3ED583D835CC072BA442F7 /* ContextMenuActionTests.swift in Sources */,
+				F8B665E14F555B5683A64EA3 /* ManifestCacheManagerTests.swift in Sources */,
 				D9D1FC24E55250860FF6AA5D /* PersistenceControllerTests.swift in Sources */,
 				3B77607C97AEA365C179293C /* PluginFormatTests.swift in Sources */,
 				0A69C6CDB779E830D34E4E81 /* PluginHideTests.swift in Sources */,

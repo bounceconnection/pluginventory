@@ -116,8 +116,9 @@ struct PluginUpdaterApp: App {
             _ = await NotificationManager.shared.requestAuthorization()
         }
 
-        // Load manifest + scan
+        // Load manifest + cached entries for instant display + scan
         await appState.loadManifest()
+        await appState.loadCachedManifestEntries()
         await appState.performScan()
 
         // Check for app updates

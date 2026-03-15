@@ -534,6 +534,11 @@ struct DashboardView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
+                if let lastRefresh = appState.lastManifestRefresh {
+                    Text("Updates checked \(lastRefresh, format: .relative(presentation: .named))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)

@@ -13,6 +13,7 @@ final class AppState {
     var manifestEntries: [String: UpdateManifestEntry] = [:]
     var updatesAvailableCount = 0
     var availableAppUpdate: AppUpdateChecker.AppUpdate?
+    var lastManifestRefresh: Date?
     var isProjectScanning = false
     var projectScanProgress: Double = 0
     var projectScanStatusText: String = ""
@@ -28,6 +29,7 @@ final class AppState {
     private let versionChecker = VersionChecker()
     private let vendorURLResolver = VendorURLResolver()
     private let appUpdateChecker = AppUpdateChecker()
+    private let manifestCacheManager = ManifestCacheManager()
     private var prefetchTask: Task<Void, Never>?
 
     /// Plist fields from most recent scan, keyed by bundleID.
@@ -54,6 +56,26 @@ final class AppState {
         // Load cask mappings + vendor URL overrides
         await versionChecker.loadMappings()
         await vendorURLResolver.loadOverrides()
+    }
+
+    /// Loads cached manifest entries from disk for instant startup display.
+    func loadCachedManifestEntries() async {
+        guard let cached = await manifestCacheManager.load() else { return }
+        // Only apply cached entries that aren't already populated by the bundled manifest
+        for (bundleID, entry) in cached.entries where manifestEntries[bundleID] == nil {
+            manifestEntries[bundleID] = entry
+        }
+        lastManifestRefresh = cached.lastRefreshed
+        AppLogger.shared.info(
+            "Loaded \(cached.entries.count) cached manifest entries (refreshed \(cached.lastRefreshed.formatted(.relative(presentation: .named))))",
+            category: "updates"
+        )
+    }
+
+    /// Saves current manifest entries to disk cache for next launch.
+    func saveCachedManifestEntries() async {
+        await manifestCacheManager.save(manifestEntries)
+        lastManifestRefresh = .now
     }
 
     /// Checks for available updates via the Homebrew Formulae API
@@ -91,6 +113,9 @@ final class AppState {
         }.count
 
         AppLogger.shared.info("Update check complete — \(updatesAvailableCount) updates available", category: "updates")
+
+        // Cache manifest entries for instant display on next launch
+        await saveCachedManifestEntries()
     }
 
     /// Checks the GitHub Releases API for a newer version of PluginUpdater.

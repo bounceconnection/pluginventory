@@ -42,6 +42,10 @@ enum Constants {
         static let scanCompleted = "com.bounceconnection.PluginUpdater.scanCompleted"
     }
 
+    enum CacheFiles {
+        static let manifestCache = "manifest_cache.json"
+    }
+
     enum AssetNames {
         static let menuBarIcon = "MenuBarIcon"
         static let appIcon = "AppIcon"
