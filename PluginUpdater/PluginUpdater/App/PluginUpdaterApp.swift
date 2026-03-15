@@ -89,6 +89,7 @@ struct PluginUpdaterApp: App {
             Constants.UserDefaultsKeys.notifyNewPlugins: true,
             Constants.UserDefaultsKeys.notifyUpdatedPlugins: true,
             Constants.UserDefaultsKeys.notifyRemovedPlugins: true,
+            Constants.UserDefaultsKeys.checkForAppUpdates: true,
         ])
 
         AppLogger.shared.info(
@@ -114,7 +115,18 @@ struct PluginUpdaterApp: App {
         await appState.loadManifest()
         await appState.performScan()
 
+        // Check for app updates
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.checkForAppUpdates) {
+            await appState.checkForAppUpdate()
+        }
+
         // Start auto-scan timer
         appState.startAutoScanTimer()
+
+        // Scan Ableton projects if enabled
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.scanProjectsOnLaunch) {
+            await appState.performProjectScan()
+        }
+        appState.startProjectMonitoring()
     }
 }

@@ -18,6 +18,16 @@ enum Constants {
         static let notifyNewPlugins = "notifyNewPlugins"
         static let notifyUpdatedPlugins = "notifyUpdatedPlugins"
         static let notifyRemovedPlugins = "notifyRemovedPlugins"
+        static let checkForAppUpdates = "checkForAppUpdates"
+        static let projectScanDirectories = "projectScanDirectories"
+        static let scanProjectsOnLaunch = "scanProjectsOnLaunch"
+        static let monitorProjectDirectories = "monitorProjectDirectories"
+    }
+
+    enum AppUpdateConfig {
+        static let repoOwner = "bounceconnection"
+        static let repoName = "plugin_updater"
+        static let githubAPIBase = "https://api.github.com"
     }
 
     enum NotificationIdentifiers {
@@ -38,4 +48,9 @@ enum Constants {
         ("/Library/Audio/Plug-Ins/VST", .vst2),
         ("/Library/Audio/Plug-Ins/VST3", .vst3),
     ]
+
+    static let defaultProjectScanDirectories: [String] = {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        return ["\(home)/Documents/Ableton Projects"]
+    }()
 }

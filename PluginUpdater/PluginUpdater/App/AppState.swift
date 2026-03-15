@@ -12,6 +12,10 @@ final class AppState {
     var errorMessage: String?
     var manifestEntries: [String: UpdateManifestEntry] = [:]
     var updatesAvailableCount = 0
+    var availableAppUpdate: AppUpdateChecker.AppUpdate?
+    var isProjectScanning = false
+    var totalProjectCount = 0
+    var projectsWithMissingPlugins = 0
 
     private(set) var modelContainer: ModelContainer
     private var fileMonitor: FileSystemMonitor?
@@ -20,7 +24,9 @@ final class AppState {
     private let manifestManager = ManifestManager()
     private let versionChecker = VersionChecker()
     private let vendorURLResolver = VendorURLResolver()
+    private let appUpdateChecker = AppUpdateChecker()
     private var prefetchTask: Task<Void, Never>?
+    private var projectFileMonitor: FileSystemMonitor?
 
     /// Plist fields from most recent scan, keyed by bundleID.
     /// Used by VendorURLResolver for URL extraction from plist metadata.
@@ -83,6 +89,13 @@ final class AppState {
         }.count
 
         AppLogger.shared.info("Update check complete — \(updatesAvailableCount) updates available", category: "updates")
+    }
+
+    /// Checks the GitHub Releases API for a newer version of PluginUpdater.
+    func checkForAppUpdate() async {
+        availableAppUpdate = await appUpdateChecker.checkForUpdate(
+            currentVersion: AppVersion.version
+        )
     }
 
     /// Uses VendorURLResolver to find URLs for plugins without download links.
@@ -424,6 +437,89 @@ final class AppState {
                 }
             }
         }
+    }
+
+    // MARK: - Project Scanning
+
+    /// Scans configured Ableton project directories and reconciles results.
+    func performProjectScan() async {
+        guard !isProjectScanning else { return }
+        isProjectScanning = true
+
+        do {
+            let directories = projectScanDirectories()
+            guard !directories.isEmpty else {
+                isProjectScanning = false
+                return
+            }
+
+            AppLogger.shared.info(
+                "Project scan started — \(directories.count) directories",
+                category: "scan"
+            )
+
+            let scanner = AbletonProjectScanner()
+            let scanResult = await scanner.scan(directories: directories)
+
+            let reconciler = ProjectReconciler(modelContainer: modelContainer)
+            let result = try await reconciler.reconcile(parsedProjects: scanResult.projects)
+
+            let countDescriptor = FetchDescriptor<AbletonProject>(
+                predicate: #Predicate { !$0.isRemoved }
+            )
+            totalProjectCount = (try? modelContainer.mainContext.fetchCount(countDescriptor))
+                ?? result.totalProcessed
+
+            let allProjects = try? modelContainer.mainContext.fetch(
+                FetchDescriptor<AbletonProject>(
+                    predicate: #Predicate { !$0.isRemoved }
+                )
+            )
+            projectsWithMissingPlugins = allProjects?
+                .filter { $0.missingPluginCount > 0 }.count ?? 0
+
+            AppLogger.shared.info(
+                "Project scan complete — \(totalProjectCount) projects, \(scanResult.errors.count) errors",
+                category: "scan"
+            )
+        } catch {
+            AppLogger.shared.error(
+                "Project scan failed: \(error.localizedDescription)",
+                category: "scan"
+            )
+        }
+
+        isProjectScanning = false
+    }
+
+    func projectScanDirectories() -> [URL] {
+        let saved = UserDefaults.standard.stringArray(
+            forKey: Constants.UserDefaultsKeys.projectScanDirectories
+        )
+        let paths = saved ?? Constants.defaultProjectScanDirectories
+        return paths.map { URL(fileURLWithPath: $0) }
+    }
+
+    func startProjectMonitoring() {
+        guard UserDefaults.standard.bool(
+            forKey: Constants.UserDefaultsKeys.monitorProjectDirectories
+        ) else { return }
+
+        projectFileMonitor?.stopMonitoring()
+        let monitor = FileSystemMonitor()
+        monitor.onDirectoriesChanged = { [weak self] _ in
+            guard let self else { return }
+            Task { @MainActor in
+                await self.performProjectScan()
+            }
+        }
+        monitor.startMonitoring(directories: projectScanDirectories())
+        projectFileMonitor = monitor
+    }
+
+    func stopProjectMonitoring() {
+        projectFileMonitor?.stopMonitoring()
+        projectFileMonitor = nil
     }
 
     // MARK: - Private
