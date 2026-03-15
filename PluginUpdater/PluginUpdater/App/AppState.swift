@@ -469,6 +469,7 @@ final class AppState {
 
             let scanner = AbletonProjectScanner()
             let reconciler = ProjectReconciler(modelContainer: modelContainer)
+            try await reconciler.prepareForScan()
             let stream = await scanner.scanStreaming(directories: directories)
             var allScannedPaths: Set<String> = []
             var errorCount = 0
@@ -504,6 +505,7 @@ final class AppState {
             projectScanStatusText = "Cleaning up..."
             projectScanProgress = 0.85
             let removedCount = try await reconciler.markMissingProjects(scannedPaths: allScannedPaths)
+            await reconciler.finishScan()
             if removedCount > 0 {
                 AppLogger.shared.info(
                     "Marked \(removedCount) missing projects as removed",

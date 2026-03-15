@@ -69,12 +69,13 @@ struct ProjectReconcilerTests {
     func updatesExistingProject() async throws {
         let container = try makeContainer()
 
-        // Insert initial project
+        // Insert initial project with an older lastModified date
         let context = ModelContext(container)
+        let oldDate = Date.now.addingTimeInterval(-3600)
         let project = AbletonProject(
             filePath: "/projects/track-a.als",
             name: "Track A",
-            lastModified: .now,
+            lastModified: oldDate,
             fileSize: 1024
         )
         let oldPlugin = AbletonProjectPlugin(pluginName: "OldPlugin", pluginType: "vst3")
@@ -82,7 +83,7 @@ struct ProjectReconcilerTests {
         context.insert(project)
         try context.save()
 
-        // Re-scan with different plugins
+        // Re-scan with different plugins and a newer lastModified
         let reconciler = ProjectReconciler(modelContainer: container)
         let parsed = [
             makeParsedProject(name: "Track A", filePath: "/projects/track-a.als", plugins: [
