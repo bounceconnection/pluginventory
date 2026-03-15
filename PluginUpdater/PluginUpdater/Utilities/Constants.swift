@@ -18,6 +18,13 @@ enum Constants {
         static let notifyNewPlugins = "notifyNewPlugins"
         static let notifyUpdatedPlugins = "notifyUpdatedPlugins"
         static let notifyRemovedPlugins = "notifyRemovedPlugins"
+        static let checkForAppUpdates = "checkForAppUpdates"
+    }
+
+    enum AppUpdateConfig {
+        static let repoOwner = "bounceconnection"
+        static let repoName = "plugin_updater"
+        static let githubAPIBase = "https://api.github.com"
     }
 
     enum NotificationIdentifiers {

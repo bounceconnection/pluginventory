@@ -89,6 +89,7 @@ struct PluginUpdaterApp: App {
             Constants.UserDefaultsKeys.notifyNewPlugins: true,
             Constants.UserDefaultsKeys.notifyUpdatedPlugins: true,
             Constants.UserDefaultsKeys.notifyRemovedPlugins: true,
+            Constants.UserDefaultsKeys.checkForAppUpdates: true,
         ])
 
         AppLogger.shared.info(
@@ -113,6 +114,11 @@ struct PluginUpdaterApp: App {
         // Load manifest + scan
         await appState.loadManifest()
         await appState.performScan()
+
+        // Check for app updates
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.checkForAppUpdates) {
+            await appState.checkForAppUpdate()
+        }
 
         // Start auto-scan timer
         appState.startAutoScanTimer()

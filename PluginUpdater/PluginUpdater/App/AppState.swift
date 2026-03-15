@@ -12,6 +12,7 @@ final class AppState {
     var errorMessage: String?
     var manifestEntries: [String: UpdateManifestEntry] = [:]
     var updatesAvailableCount = 0
+    var availableAppUpdate: AppUpdateChecker.AppUpdate?
 
     private(set) var modelContainer: ModelContainer
     private var fileMonitor: FileSystemMonitor?
@@ -20,6 +21,7 @@ final class AppState {
     private let manifestManager = ManifestManager()
     private let versionChecker = VersionChecker()
     private let vendorURLResolver = VendorURLResolver()
+    private let appUpdateChecker = AppUpdateChecker()
     private var prefetchTask: Task<Void, Never>?
 
     /// Plist fields from most recent scan, keyed by bundleID.
@@ -83,6 +85,13 @@ final class AppState {
         }.count
 
         AppLogger.shared.info("Update check complete — \(updatesAvailableCount) updates available", category: "updates")
+    }
+
+    /// Checks the GitHub Releases API for a newer version of PluginUpdater.
+    func checkForAppUpdate() async {
+        availableAppUpdate = await appUpdateChecker.checkForUpdate(
+            currentVersion: AppVersion.version
+        )
     }
 
     /// Uses VendorURLResolver to find URLs for plugins without download links.
