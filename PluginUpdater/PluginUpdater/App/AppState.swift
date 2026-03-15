@@ -451,6 +451,8 @@ final class AppState {
                 return
             }
 
+            let scanStart = Date()
+
             AppLogger.shared.info(
                 "Project scan started — \(directories.count) directories",
                 category: "scan"
@@ -517,8 +519,9 @@ final class AppState {
 
             projectScanProgress = 1.0
 
+            let totalDuration = Date().timeIntervalSince(scanStart)
             AppLogger.shared.info(
-                "Project scan complete — \(totalProjectCount) projects, \(errorCount) errors",
+                "Project scan complete — \(totalProjectCount) projects, \(errorCount) errors in \(String(format: "%.1f", totalDuration))s",
                 category: "scan"
             )
         } catch {
