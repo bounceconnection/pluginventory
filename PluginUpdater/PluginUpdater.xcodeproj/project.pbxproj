@@ -9,19 +9,27 @@
 /* Begin PBXBuildFile section */
 		001056A58D6A044FE878C816 /* CPUArchitecture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E9F0D88FC395A0E299CABE /* CPUArchitecture.swift */; };
 		0A69C6CDB779E830D34E4E81 /* PluginHideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54993856C5106C87AEBC386E /* PluginHideTests.swift */; };
+		0C2B1176C0E94B366EEA9719 /* AppUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC140E85F6B430D9D28E88F /* AppUpdateChecker.swift */; };
 		0D301D58EFA2BE8EE6C3DCF5 /* UpdateManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A837F2C3F147FE3B2378743E /* UpdateManifestTests.swift */; };
 		0D59BE745E8A11095705C990 /* VendorResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DBDCA9E8EEA702794CA532A /* VendorResolverTests.swift */; };
 		1426A98A13DBF5C5D184993D /* VendorResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3A07860952E18E0DEC046B /* VendorResolver.swift */; };
+		158504F9C4BF11B961B54251 /* PluginMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26C4FEC3DC6C7D6191981965 /* PluginMatcher.swift */; };
 		1AD3F653DF2ED4EE9DE9FA48 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696F41E6C13E22B96BB66267 /* DashboardView.swift */; };
 		2399380FC71A4C0E4A1393F6 /* BundleMetadataExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197B81B66CD75BA67B4741F0 /* BundleMetadataExtractor.swift */; };
 		2638FD8F14CECB04E4FA2257 /* VendorInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613B2B7BA5C37C8E758A0BF9 /* VendorInfo.swift */; };
+		26EC09E92BD8EB4594B0581B /* AbletonProjectParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDE5668FF5EA5B0845DD8F3 /* AbletonProjectParser.swift */; };
+		2B88331B0AB8407AE5B3B5F9 /* AppUpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000674EA4300F88278E2F37 /* AppUpdateCheckerTests.swift */; };
 		2EF730C86C416F28B22BEC98 /* PluginVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC4908F51CDC729F0645FC6 /* PluginVersion.swift */; };
 		300120473D5D58C1510785F3 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8507964F3E9247BFC5BB580 /* PersistenceController.swift */; };
 		309026F4A5FE45F2A6B979CC /* VendorURLResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058703EFBA8361D1A9CFE0E8 /* VendorURLResolverTests.swift */; };
 		3B77607C97AEA365C179293C /* PluginFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02063DE3C8D3333A309332EC /* PluginFormatTests.swift */; };
 		424E33F6164C2AC0F13DC754 /* PluginScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0075A029C426D72E02843DB /* PluginScanner.swift */; };
+		431B5E454463F9CA9C3AF02E /* AbletonProjectScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C88F3F96F4096F64078A348 /* AbletonProjectScanner.swift */; };
+		4B7C03DCD25941E0E9D4CE59 /* ProjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7F42BE5E5DA6496192F356 /* ProjectListView.swift */; };
+		4C33669D95444617E54A5D63 /* AbletonProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB541C2C1BBAE25F36584A8F /* AbletonProject.swift */; };
 		4D3ED583D835CC072BA442F7 /* ContextMenuActionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE222F13CA653E287E98D190 /* ContextMenuActionTests.swift */; };
 		5AC8E361BC1A63D3672BA750 /* vendor_urls.json in Resources */ = {isa = PBXBuildFile; fileRef = BE724FF345F7369F4059BB6E /* vendor_urls.json */; };
+		5E74265A9645B66EB4C21E84 /* ProjectDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77BFAC4857A07DF1A9660DB8 /* ProjectDetailView.swift */; };
 		5EC118195278CECA9A597B86 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC93F8EF57BA9A0FD9879280 /* AppState.swift */; };
 		672E54C5CE4EBBA486DA3D1A /* PluginImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C33FFFC7417CE4C6FC7FF12 /* PluginImageService.swift */; };
 		676BD62C9C7651D4D040103F /* AvailableVersionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C11DF638C0C66FA77CD533E /* AvailableVersionCell.swift */; };
@@ -59,6 +67,7 @@
 		E1065AF7BEAEE6C7B28F1A6E /* ArchitectureDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66AD28DDDD2ED9703BCD41B /* ArchitectureDetector.swift */; };
 		E36F62F52B778306706E170D /* PluginUpdaterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5E64D484AEBF8F443CC747 /* PluginUpdaterApp.swift */; };
 		ECA8707A7773A23B9E80059F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9D30986AADC09D953814BE /* Constants.swift */; };
+		EDC66A04A27FBAE6D80470EC /* ProjectReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 859839BCCB9C43D08AF95F7D /* ProjectReconciler.swift */; };
 		EDF5385E9626F393378D3790 /* ScanPathsEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC3971E9045D641781CF69E /* ScanPathsEditor.swift */; };
 		F1190AAC2028E4067E12D151 /* ScanLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A588CB8DFDCA92B11B7ECDC7 /* ScanLocation.swift */; };
 		F3C6BA58672FB61A3F52CA11 /* BundleMetadataExtractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA6B4E9B3F58F0C720500CB /* BundleMetadataExtractorTests.swift */; };
@@ -66,6 +75,7 @@
 		F65525A9AA9BCA5A0249F223 /* FileSystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6374A2122F3079A1BD7E318D /* FileSystemMonitor.swift */; };
 		F720A9F3DF5B4C2CB1F06D77 /* VersionChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DF70C3C105617C5ED85FF7 /* VersionChecker.swift */; };
 		FA9F5B3B76F71F73DA81D765 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E455535FE74D6F17BDEBF9E /* SettingsView.swift */; };
+		FC5247E53239629726DAC9D6 /* AbletonProjectPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF560CA07A0EBF86AD46F17 /* AbletonProjectPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,9 +97,12 @@
 		17D4C0D1A9C8114B07C93E84 /* PluginScannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginScannerTests.swift; sourceTree = "<group>"; };
 		17DFB4D8B2C016D078A49A68 /* PluginFormatBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginFormatBadge.swift; sourceTree = "<group>"; };
 		197B81B66CD75BA67B4741F0 /* BundleMetadataExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleMetadataExtractor.swift; sourceTree = "<group>"; };
+		1C88F3F96F4096F64078A348 /* AbletonProjectScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbletonProjectScanner.swift; sourceTree = "<group>"; };
+		26C4FEC3DC6C7D6191981965 /* PluginMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginMatcher.swift; sourceTree = "<group>"; };
 		26FAE2FD3A9E736C649A8D80 /* PluginUpdater.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PluginUpdater.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27AD453D9B6930C4A3717BED /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		2A275AFC90E301499BCBB80A /* default_manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = default_manifest.json; sourceTree = "<group>"; };
+		2FC140E85F6B430D9D28E88F /* AppUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateChecker.swift; sourceTree = "<group>"; };
 		3B2A40B95918D92D1FAEB0BC /* UpdateStatusIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateStatusIndicator.swift; sourceTree = "<group>"; };
 		3C4F86DC778100292C275751 /* UpdateStatusIndicatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateStatusIndicatorTests.swift; sourceTree = "<group>"; };
 		3E9D30986AADC09D953814BE /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -101,6 +114,7 @@
 		54993856C5106C87AEBC386E /* PluginHideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginHideTests.swift; sourceTree = "<group>"; };
 		5642C14BB4CA023226BC86AA /* AssetNamesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetNamesTests.swift; sourceTree = "<group>"; };
 		567E1F6ED699C9EAFA295ED1 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		5BDE5668FF5EA5B0845DD8F3 /* AbletonProjectParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbletonProjectParser.swift; sourceTree = "<group>"; };
 		5C11DF638C0C66FA77CD533E /* AvailableVersionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableVersionCell.swift; sourceTree = "<group>"; };
 		5C33FFFC7417CE4C6FC7FF12 /* PluginImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginImageService.swift; sourceTree = "<group>"; };
 		5CE6380DB266015098CA2F47 /* URLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensionTests.swift; sourceTree = "<group>"; };
@@ -110,9 +124,11 @@
 		68BBAABB4C7CF313F0C5E8E0 /* VendorLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorLink.swift; sourceTree = "<group>"; };
 		696F41E6C13E22B96BB66267 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		6BC8E0BFE748332634B82821 /* Plugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
+		77BFAC4857A07DF1A9660DB8 /* ProjectDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailView.swift; sourceTree = "<group>"; };
 		7A598E6367944C87FE41AEE0 /* PluginReconcilerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginReconcilerTests.swift; sourceTree = "<group>"; };
 		7E455535FE74D6F17BDEBF9E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7FE3723F80F115C503F6117F /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
+		859839BCCB9C43D08AF95F7D /* ProjectReconciler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectReconciler.swift; sourceTree = "<group>"; };
 		8A76A6D01E0000F16BC1BA92 /* PluginUpdater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PluginUpdater.entitlements; sourceTree = "<group>"; };
 		8BC4908F51CDC729F0645FC6 /* PluginVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginVersion.swift; sourceTree = "<group>"; };
 		8FD735DCF3B89D813DB2D8CF /* UpdateManifestEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateManifestEntry.swift; sourceTree = "<group>"; };
@@ -125,7 +141,10 @@
 		A837F2C3F147FE3B2378743E /* UpdateManifestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateManifestTests.swift; sourceTree = "<group>"; };
 		A8507964F3E9247BFC5BB580 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		AB464ABB49A24F29E6CF5654 /* ManifestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestManager.swift; sourceTree = "<group>"; };
+		AB541C2C1BBAE25F36584A8F /* AbletonProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbletonProject.swift; sourceTree = "<group>"; };
 		B66AD28DDDD2ED9703BCD41B /* ArchitectureDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchitectureDetector.swift; sourceTree = "<group>"; };
+		BB7F42BE5E5DA6496192F356 /* ProjectListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectListView.swift; sourceTree = "<group>"; };
+		BBF560CA07A0EBF86AD46F17 /* AbletonProjectPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbletonProjectPlugin.swift; sourceTree = "<group>"; };
 		BE724FF345F7369F4059BB6E /* vendor_urls.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vendor_urls.json; sourceTree = "<group>"; };
 		C0075A029C426D72E02843DB /* PluginScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginScanner.swift; sourceTree = "<group>"; };
 		C419BEFFE80A25F8F0CCC4E2 /* VersionCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionCheckerTests.swift; sourceTree = "<group>"; };
@@ -139,6 +158,7 @@
 		EC93F8EF57BA9A0FD9879280 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		EE5E64D484AEBF8F443CC747 /* PluginUpdaterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginUpdaterApp.swift; sourceTree = "<group>"; };
 		EF0DAA61F5C1D3CA587AF319 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionHistoryView.swift; sourceTree = "<group>"; };
+		F000674EA4300F88278E2F37 /* AppUpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateCheckerTests.swift; sourceTree = "<group>"; };
 		F5DF70C3C105617C5ED85FF7 /* VersionChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionChecker.swift; sourceTree = "<group>"; };
 		FE222F13CA653E287E98D190 /* ContextMenuActionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuActionTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -216,6 +236,7 @@
 		4B79FF31AD704FCEE3410494 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F000674EA4300F88278E2F37 /* AppUpdateCheckerTests.swift */,
 				CB60DE5B1E64F45E37BD8A1C /* ArchitectureDetectorTests.swift */,
 				CBA6B4E9B3F58F0C720500CB /* BundleMetadataExtractorTests.swift */,
 				0F4C374ECB160B55AF5974F3 /* PersistenceControllerTests.swift */,
@@ -235,6 +256,7 @@
 			children = (
 				A8507964F3E9247BFC5BB580 /* PersistenceController.swift */,
 				48945FF5154578D9FA574F84 /* PluginReconciler.swift */,
+				859839BCCB9C43D08AF95F7D /* ProjectReconciler.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -246,6 +268,15 @@
 				151EB46EC83CDD51442D51E8 /* URL+PluginBundle.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		5B721B1076B50F3E409B029C /* Projects */ = {
+			isa = PBXGroup;
+			children = (
+				77BFAC4857A07DF1A9660DB8 /* ProjectDetailView.swift */,
+				BB7F42BE5E5DA6496192F356 /* ProjectListView.swift */,
+			);
+			path = Projects;
 			sourceTree = "<group>";
 		};
 		66EF6A892836BCFE1C1A5AC1 /* Dashboard */ = {
@@ -263,6 +294,7 @@
 				66EF6A892836BCFE1C1A5AC1 /* Dashboard */,
 				01634FF47B66356B3293C6C9 /* Detail */,
 				81BF4D2789431D9FE51BA91C /* MenuBar */,
+				5B721B1076B50F3E409B029C /* Projects */,
 				48217EE8A0F52F6229BA7415 /* Settings */,
 			);
 			path = Views;
@@ -343,6 +375,8 @@
 		C5F74C4848B26F5B4EE7FB8D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				AB541C2C1BBAE25F36584A8F /* AbletonProject.swift */,
+				BBF560CA07A0EBF86AD46F17 /* AbletonProjectPlugin.swift */,
 				40E9F0D88FC395A0E299CABE /* CPUArchitecture.swift */,
 				6BC8E0BFE748332634B82821 /* Plugin.swift */,
 				50B2F733E2F4A6FA4BFC9282 /* PluginFormat.swift */,
@@ -366,8 +400,11 @@
 		DC38C4483E3C50FF1022E16F /* Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				5BDE5668FF5EA5B0845DD8F3 /* AbletonProjectParser.swift */,
+				1C88F3F96F4096F64078A348 /* AbletonProjectScanner.swift */,
 				B66AD28DDDD2ED9703BCD41B /* ArchitectureDetector.swift */,
 				197B81B66CD75BA67B4741F0 /* BundleMetadataExtractor.swift */,
+				26C4FEC3DC6C7D6191981965 /* PluginMatcher.swift */,
 				C0075A029C426D72E02843DB /* PluginScanner.swift */,
 				DA3A07860952E18E0DEC046B /* VendorResolver.swift */,
 			);
@@ -394,6 +431,7 @@
 		FBF64783BEC6E3E1450771B9 /* Updates */ = {
 			isa = PBXGroup;
 			children = (
+				2FC140E85F6B430D9D28E88F /* AppUpdateChecker.swift */,
 				AB464ABB49A24F29E6CF5654 /* ManifestManager.swift */,
 				CE00D48FF579CB2C859A32CF /* VendorURLResolver.swift */,
 				F5DF70C3C105617C5ED85FF7 /* VersionChecker.swift */,
@@ -527,8 +565,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C33669D95444617E54A5D63 /* AbletonProject.swift in Sources */,
+				26EC09E92BD8EB4594B0581B /* AbletonProjectParser.swift in Sources */,
+				FC5247E53239629726DAC9D6 /* AbletonProjectPlugin.swift in Sources */,
+				431B5E454463F9CA9C3AF02E /* AbletonProjectScanner.swift in Sources */,
 				BD97DA43C9B1536C8035B73E /* AppLogger.swift in Sources */,
 				5EC118195278CECA9A597B86 /* AppState.swift in Sources */,
+				0C2B1176C0E94B366EEA9719 /* AppUpdateChecker.swift in Sources */,
 				899B613AB284F8F9D528EC0B /* AppVersion.swift in Sources */,
 				E1065AF7BEAEE6C7B28F1A6E /* ArchitectureDetector.swift in Sources */,
 				676BD62C9C7651D4D040103F /* AvailableVersionCell.swift in Sources */,
@@ -547,10 +590,14 @@
 				9E34A902CB91B58410878005 /* PluginFormat.swift in Sources */,
 				C3C4D4DD4EDB0D265BF124A2 /* PluginFormatBadge.swift in Sources */,
 				672E54C5CE4EBBA486DA3D1A /* PluginImageService.swift in Sources */,
+				158504F9C4BF11B961B54251 /* PluginMatcher.swift in Sources */,
 				DE50686CF90D72FE5067B057 /* PluginReconciler.swift in Sources */,
 				424E33F6164C2AC0F13DC754 /* PluginScanner.swift in Sources */,
 				E36F62F52B778306706E170D /* PluginUpdaterApp.swift in Sources */,
 				2EF730C86C416F28B22BEC98 /* PluginVersion.swift in Sources */,
+				5E74265A9645B66EB4C21E84 /* ProjectDetailView.swift in Sources */,
+				4B7C03DCD25941E0E9D4CE59 /* ProjectListView.swift in Sources */,
+				EDC66A04A27FBAE6D80470EC /* ProjectReconciler.swift in Sources */,
 				F1190AAC2028E4067E12D151 /* ScanLocation.swift in Sources */,
 				EDF5385E9626F393378D3790 /* ScanPathsEditor.swift in Sources */,
 				FA9F5B3B76F71F73DA81D765 /* SettingsView.swift in Sources */,
@@ -571,6 +618,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B88331B0AB8407AE5B3B5F9 /* AppUpdateCheckerTests.swift in Sources */,
 				A83F2BF484741B576EBFD528 /* ArchitectureDetectorTests.swift in Sources */,
 				A4F965356550E03BE2D1254D /* AssetNamesTests.swift in Sources */,
 				F3C6BA58672FB61A3F52CA11 /* BundleMetadataExtractorTests.swift in Sources */,

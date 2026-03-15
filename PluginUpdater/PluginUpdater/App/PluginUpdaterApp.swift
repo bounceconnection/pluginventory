@@ -85,6 +85,10 @@ struct PluginUpdaterApp: App {
 
     @MainActor
     private func initialSetup() async {
+        UserDefaults.standard.register(defaults: [
+            Constants.UserDefaultsKeys.checkForAppUpdates: true,
+        ])
+
         AppLogger.shared.info(
             "App started — version \(AppVersion.displayVersion), macOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
             category: "startup"
@@ -107,6 +111,11 @@ struct PluginUpdaterApp: App {
         // Load manifest + scan
         await appState.loadManifest()
         await appState.performScan()
+
+        // Check for app updates
+        if UserDefaults.standard.bool(forKey: Constants.UserDefaultsKeys.checkForAppUpdates) {
+            await appState.checkForAppUpdate()
+        }
 
         // Start auto-scan timer
         appState.startAutoScanTimer()

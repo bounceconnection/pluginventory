@@ -15,6 +15,13 @@ enum Constants {
         static let launchAtLogin = "launchAtLogin"
         static let lastScanDate = "lastScanDate"
         static let hasCompletedOnboarding = "hasCompletedOnboarding"
+        static let checkForAppUpdates = "checkForAppUpdates"
+    }
+
+    enum AppUpdateConfig {
+        static let repoOwner = "bounceconnection"
+        static let repoName = "plugin_updater"
+        static let githubAPIBase = "https://api.github.com"
     }
 
     enum NotificationIdentifiers {
