@@ -1,26 +1,40 @@
 # Pluginventory
 
-A macOS app that scans your installed audio plugins (AU, CLAP, VST2, VST3), tracks versions, checks for updates, and analyzes Ableton Live projects to identify missing plugins.
+Your audio plugin library, organized. A native macOS app that catalogs every AU, CLAP, VST2, and VST3 plugin on your system, tracks version history, checks for updates, and shows you exactly which plugins each Ableton project depends on.
 
 ![Dashboard](screenshots/dashboard.png)
 
 ## Features
 
-- **Automatic Plugin Discovery** — Scans standard macOS audio plugin directories and reads bundle metadata (CFBundleIdentifier, version, vendor)
-- **Update Detection** — Checks for newer versions of your installed plugins via the Homebrew Formulae API
-- **Format Support** — Supports AU, CLAP, VST2, and VST3 plugin formats
-- **Ableton Project Scanner** — Parses .als project files to identify which plugins each project uses and flags missing ones
-- **Live Streaming Scan** — Projects appear in the table incrementally during scanning so you can start browsing immediately
-- **Multi-Select & Bulk Actions** — Cmd+click or Shift+click to select multiple plugins, then right-click for bulk operations
-- **Context Menu** — Copy Paths, Copy Full Details, Reveal in Finder, Open Publisher Website, and Hide/Unhide actions on any selection
-- **CPU Architecture Detection** — Shows Apple Silicon, Intel 64, Universal, or legacy (Intel 32/PowerPC) status with warning badges
-- **Sortable Columns** — Sorts by name, vendor, format, installed version, available version, architecture, size, or date added
-- **Hide Plugins** — Right-click to hide plugins you don't care about; view and unhide them from the Hidden section in the sidebar
-- **Sidebar Filtering** — Filters by format (AU, CLAP, VST2, VST3), updates available, used/unused plugins, or projects with missing plugins
-- **Detail Inspector** — Shows architecture, size, bundle ID, file path, version history, and download links for any plugin
-- **Real-time Monitoring** — Uses FSEvents to detect plugin changes in the background and triggers incremental scans
-- **Menu Bar Access** — Provides a quick status view from the menu bar showing recent changes and update counts
-- **Granular Notifications** — Separate toggles for new, updated, and removed plugin notifications
+### Plugin Discovery & Management
+- **Automatic scanning** of standard macOS audio plugin directories with real-time FSEvents monitoring
+- **AU, CLAP, VST2, and VST3** format support with color-coded format badges
+- **CPU architecture detection** — flags Apple Silicon, Intel 64, Universal, and legacy (i386/PowerPC) with warning badges
+- **Sortable, searchable table** — 11 columns (name, vendor, format, installed version, available version, download, architecture, size, date added, projects, instances) with persistent sort order
+- **Multi-select and bulk actions** — Cmd+click / Shift+click, then right-click to copy paths, copy full details, reveal in Finder, open publisher website, or hide/unhide
+- **Detail inspector** — plugin image, version history, bundle ID, file path, architecture, download links
+
+### Update Checking
+- **Homebrew Cask integration** — maps bundle IDs to Cask names and queries the Formulae API for latest versions
+- **Manifest caching** — cached entries display instantly on launch, then refresh in the background
+- **Vendor URL resolution** — intelligently finds publisher websites via plist metadata, reverse-domain lookup, and web search fallback
+- **In-app update checker** — checks GitHub Releases for new Pluginventory versions
+
+### Ableton Project Analysis
+- **Scans .als project files** to identify which plugins each project uses (AU, VST3, VST2)
+- **Missing plugin detection** — flags plugins referenced in projects but not installed on your system
+- **Live streaming scan** — projects appear in the table incrementally as they're parsed
+- **Project detail view** — plugins grouped by format with installed/missing status and instance counts
+
+### Menu Bar & Monitoring
+- **Menu bar extra** — quick access popover showing plugin count, update count, recent changes, and scan controls
+- **Real-time file system monitoring** — detects plugin installs, updates, and removals via FSEvents with silent background rescans
+- **Granular notifications** — separate toggles for new, updated, and removed plugin notifications
+
+### Export & Shortcuts
+- **CSV export** (Cmd+Shift+E) — name, vendor, format, version, bundle ID, path
+- **Cmd+R** — scan and check for updates
+- **Cmd+,** — settings
 
 ## Requirements
 
@@ -33,7 +47,7 @@ A macOS app that scans your installed audio plugins (AU, CLAP, VST2, VST3), trac
 
 Download the latest `.pkg` installer from the [Releases page](https://github.com/bounceconnection/pluginventory/releases). Double-click to install to `/Applications`.
 
-> **Note:** Builds are unsigned. If macOS blocks the installer, right-click the `.pkg` → **Open** → **Open**.
+> **Note:** Builds are unsigned. If macOS blocks the installer, right-click the `.pkg` and choose **Open**.
 
 ### Build from Source
 
@@ -46,18 +60,16 @@ open Pluginventory.xcodeproj
 # Press Cmd+R to build and run
 ```
 
-## Usage
+## Settings
 
-1. **Launch** — On first run, scans the default plugin directories (`/Library/Audio/Plug-Ins/`)
-2. **Scan** — Click **Scan Now** in the toolbar to rescan
-3. **Updates** — Plugins with newer versions show a green version in the **Available** column
-4. **Filter** — Use the sidebar to filter by format, updates, or used/unused
-5. **Inspect** — Select a plugin and click **Info** for bundle ID, path, version history, and download links
-6. **Settings** — Press **Cmd+,** to add custom scan directories or configure notifications
+Open with **Cmd+,**:
 
-## How Update Checking Works
-
-Pluginventory maps bundle ID prefixes to [Homebrew Cask](https://formulae.brew.sh/) names, queries the API for the latest version, and compares against your installed version. The mappings file (`Resources/cask_mappings.json`) can be extended for additional vendors.
+| Tab | What it controls |
+|-----|-----------------|
+| **Scan Paths** | Enable/disable default plugin directories, add custom scan locations |
+| **Projects** | Ableton project folders, scan-on-launch toggle, folder monitoring |
+| **Notifications** | Master toggle + individual new/updated/removed toggles |
+| **General** | Auto-scan interval (15 min–6 hrs or manual), remote manifest URL, launch at login, image cache, app updates |
 
 ## Architecture
 
@@ -83,7 +95,7 @@ Pluginventory/
 ```
 
 **Key design decisions:**
-- **SwiftData** for persistence — plugins, versions, and scan locations stored locally
+- **SwiftData** for persistence — plugins, versions, projects, and scan locations stored locally
 - **Actor-based concurrency** — scanner, reconciler, and version checker use Swift actors for thread safety
 - **No third-party dependencies** — pure Swift/SwiftUI, ships as a single app bundle
 - **Plugin identity keyed on CFBundleIdentifier** — not file path, so moved plugins track correctly
@@ -92,7 +104,7 @@ Pluginventory/
 
 - **`main`** — stable releases. **`dev`** — integration branch. Feature branches off `dev`.
 - CI runs on all PRs targeting `dev` or `main` and all pushes to `dev`.
-- Releases: **Actions → Promote to Main → Run workflow** (auto-bumps patch, or specify `X.Y.Z`). Tags trigger the Release workflow which builds the `.pkg` installer.
+- Releases: **Actions > Promote to Main > Run workflow** (auto-bumps patch, or specify `X.Y.Z`). Tags trigger the Release workflow which builds the `.pkg` installer.
 - Versioning follows [SemVer](https://semver.org/).
 
 ## Troubleshooting

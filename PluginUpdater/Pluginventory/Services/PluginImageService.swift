@@ -27,14 +27,16 @@ actor PluginImageService {
 
     private init() {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        cacheDir = appSupport.appendingPathComponent("Pluginventory/PluginImages")
+        let cache = appSupport.appendingPathComponent("Pluginventory/PluginImages")
+        cacheDir = cache
         // Migrate old cache directory
         let oldCacheDir = appSupport.appendingPathComponent("PluginUpdater/PluginImages")
-        if FileManager.default.fileExists(atPath: oldCacheDir.path) && !FileManager.default.fileExists(atPath: cacheDir.path) {
-            try? FileManager.default.moveItem(at: oldCacheDir, to: cacheDir)
+        if FileManager.default.fileExists(atPath: oldCacheDir.path) && !FileManager.default.fileExists(atPath: cache.path) {
+            try? FileManager.default.moveItem(at: oldCacheDir, to: cache)
         }
-        try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
-        vendorURLOverrides = Self.loadVendorURLs()
+        try? FileManager.default.createDirectory(at: cache, withIntermediateDirectories: true)
+        let urls = Self.loadVendorURLs()
+        vendorURLOverrides = urls
     }
 
     private static func loadVendorURLs() -> [VendorURLEntry] {
