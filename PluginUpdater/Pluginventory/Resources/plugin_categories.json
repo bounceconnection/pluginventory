@@ -1,0 +1,477 @@
+[
+  {
+    "match": "com.fabfilter.Pro-Q",
+    "field": "bundleIDPrefix",
+    "category": "eq"
+  },
+  {
+    "match": "com.fabfilter.Pro-C",
+    "field": "bundleIDPrefix",
+    "category": "compressor"
+  },
+  {
+    "match": "com.fabfilter.Pro-DS",
+    "field": "bundleIDPrefix",
+    "category": "dynamics"
+  },
+  {
+    "match": "com.fabfilter.Pro-G",
+    "field": "bundleIDPrefix",
+    "category": "dynamics"
+  },
+  {
+    "match": "com.fabfilter.Pro-MB",
+    "field": "bundleIDPrefix",
+    "category": "compressor"
+  },
+  {
+    "match": "com.fabfilter.Pro-L",
+    "field": "bundleIDPrefix",
+    "category": "dynamics"
+  },
+  {
+    "match": "com.fabfilter.Pro-R",
+    "field": "bundleIDPrefix",
+    "category": "reverb"
+  },
+  {
+    "match": "com.fabfilter.Saturn",
+    "field": "bundleIDPrefix",
+    "category": "saturation"
+  },
+  {
+    "match": "com.fabfilter.Timeless",
+    "field": "bundleIDPrefix",
+    "category": "delay"
+  },
+  {
+    "match": "com.fabfilter.Volcano",
+    "field": "bundleIDPrefix",
+    "category": "filter"
+  },
+  {
+    "match": "com.fabfilter.Simplon",
+    "field": "bundleIDPrefix",
+    "category": "filter"
+  },
+  {
+    "match": "com.fabfilter.Twin",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.izotope.Ozone",
+    "field": "bundleIDPrefix",
+    "category": "mastering"
+  },
+  {
+    "match": "com.izotope.Insight",
+    "field": "bundleIDPrefix",
+    "category": "metering"
+  },
+  {
+    "match": "com.izotope.Neutron",
+    "field": "bundleIDPrefix",
+    "category": "channelStrip"
+  },
+  {
+    "match": "com.izotope.Nectar",
+    "field": "bundleIDPrefix",
+    "category": "channelStrip"
+  },
+  {
+    "match": "com.izotope.RX",
+    "field": "bundleIDPrefix",
+    "category": "noiseReduction"
+  },
+  {
+    "match": "com.izotope.Trash",
+    "field": "bundleIDPrefix",
+    "category": "distortion"
+  },
+  {
+    "match": "com.izotope.VocalSynth",
+    "field": "bundleIDPrefix",
+    "category": "creative"
+  },
+  {
+    "match": "com.ValhallaDSP.",
+    "field": "bundleIDPrefix",
+    "category": "reverb"
+  },
+  {
+    "match": "com.ValhallaDSP.ValhallaDelay",
+    "field": "bundleIDPrefix",
+    "category": "delay"
+  },
+  {
+    "match": "com.ValhallaDSP.ValhallaFreqEcho",
+    "field": "bundleIDPrefix",
+    "category": "delay"
+  },
+  {
+    "match": "com.ValhallaDSP.ValhallaSpaceModulator",
+    "field": "bundleIDPrefix",
+    "category": "modulation"
+  },
+  {
+    "match": "com.ValhallaDSP.ValhallaSupermassive",
+    "field": "bundleIDPrefix",
+    "category": "reverb"
+  },
+  {
+    "match": "com.soundtoys.",
+    "field": "bundleIDPrefix",
+    "category": "creative"
+  },
+  {
+    "match": "com.soundtoys.EchoBoy",
+    "field": "bundleIDPrefix",
+    "category": "delay"
+  },
+  {
+    "match": "com.soundtoys.Decapitator",
+    "field": "bundleIDPrefix",
+    "category": "saturation"
+  },
+  {
+    "match": "com.soundtoys.PhaseMistress",
+    "field": "bundleIDPrefix",
+    "category": "modulation"
+  },
+  {
+    "match": "com.soundtoys.MicroShift",
+    "field": "bundleIDPrefix",
+    "category": "pitch"
+  },
+  {
+    "match": "com.native-instruments.Massive",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.native-instruments.Absynth",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.native-instruments.FM8",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.native-instruments.Kontakt",
+    "field": "bundleIDPrefix",
+    "category": "sampler"
+  },
+  {
+    "match": "com.native-instruments.Battery",
+    "field": "bundleIDPrefix",
+    "category": "drums"
+  },
+  {
+    "match": "com.native-instruments.GuitarRig",
+    "field": "bundleIDPrefix",
+    "category": "guitarAmp"
+  },
+  {
+    "match": "com.xferrecords.serum",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.xferrecords.LFOTool",
+    "field": "bundleIDPrefix",
+    "category": "modulation"
+  },
+  {
+    "match": "com.xferrecords.OTT",
+    "field": "bundleIDPrefix",
+    "category": "compressor"
+  },
+  {
+    "match": "com.u-he.",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.u-he.Presswerk",
+    "field": "bundleIDPrefix",
+    "category": "compressor"
+  },
+  {
+    "match": "com.u-he.Satin",
+    "field": "bundleIDPrefix",
+    "category": "saturation"
+  },
+  {
+    "match": "com.u-he.ColourCopy",
+    "field": "bundleIDPrefix",
+    "category": "delay"
+  },
+  {
+    "match": "com.spectrasonics.Omnisphere",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.spectrasonics.Keyscape",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.spectrasonics.Stylus",
+    "field": "bundleIDPrefix",
+    "category": "drums"
+  },
+  {
+    "match": "com.oeksound.soothe",
+    "field": "bundleIDPrefix",
+    "category": "dynamics"
+  },
+  {
+    "match": "com.oeksound.spiff",
+    "field": "bundleIDPrefix",
+    "category": "dynamics"
+  },
+  {
+    "match": "com.antarestech.AutoTune",
+    "field": "bundleIDPrefix",
+    "category": "pitch"
+  },
+  {
+    "match": "com.celemony.Melodyne",
+    "field": "bundleIDPrefix",
+    "category": "pitch"
+  },
+  {
+    "match": "com.toguaudioline.",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.toguaudioline.TAL-Reverb",
+    "field": "bundleIDPrefix",
+    "category": "reverb"
+  },
+  {
+    "match": "com.toontrack.EZdrummer",
+    "field": "bundleIDPrefix",
+    "category": "drums"
+  },
+  {
+    "match": "com.toontrack.Superior",
+    "field": "bundleIDPrefix",
+    "category": "drums"
+  },
+  {
+    "match": "com.xlnaudio.AddictiveDrums",
+    "field": "bundleIDPrefix",
+    "category": "drums"
+  },
+  {
+    "match": "com.eventide.",
+    "field": "bundleIDPrefix",
+    "category": "reverb"
+  },
+  {
+    "match": "com.eventide.Blackhole",
+    "field": "bundleIDPrefix",
+    "category": "reverb"
+  },
+  {
+    "match": "com.arturia.",
+    "field": "bundleIDPrefix",
+    "category": "synth"
+  },
+  {
+    "match": "com.cableguys.",
+    "field": "bundleIDPrefix",
+    "category": "modulation"
+  },
+  {
+    "match": "com.kilohearts.",
+    "field": "bundleIDPrefix",
+    "category": "creative"
+  },
+  {
+    "match": "com.output.",
+    "field": "bundleIDPrefix",
+    "category": "creative"
+  },
+  {
+    "match": "com.softube.",
+    "field": "bundleIDPrefix",
+    "category": "saturation"
+  },
+  {
+    "match": "com.slatedigital.",
+    "field": "bundleIDPrefix",
+    "category": "channelStrip"
+  },
+  {
+    "match": "com.sonnox.",
+    "field": "bundleIDPrefix",
+    "category": "mastering"
+  },
+  {
+    "match": "Arturia",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "u-he",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "Xfer Records",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "Cableguys",
+    "field": "vendor",
+    "category": "modulation"
+  },
+  {
+    "match": "Softube",
+    "field": "vendor",
+    "category": "saturation"
+  },
+  {
+    "match": "Sonnox",
+    "field": "vendor",
+    "category": "mastering"
+  },
+  {
+    "match": "Waves",
+    "field": "vendor",
+    "category": "dynamics"
+  },
+  {
+    "match": "Slate Digital",
+    "field": "vendor",
+    "category": "channelStrip"
+  },
+  {
+    "match": "Plugin Alliance",
+    "field": "vendor",
+    "category": "channelStrip"
+  },
+  {
+    "match": "Spitfire Audio",
+    "field": "vendor",
+    "category": "sampler"
+  },
+  {
+    "match": "Output",
+    "field": "vendor",
+    "category": "creative"
+  },
+  {
+    "match": "Kilohearts",
+    "field": "vendor",
+    "category": "creative"
+  },
+  {
+    "match": "Valhalla DSP",
+    "field": "vendor",
+    "category": "reverb"
+  },
+  {
+    "match": "Newfangled Audio",
+    "field": "vendor",
+    "category": "mastering"
+  },
+  {
+    "match": "MeldaProduction",
+    "field": "vendor",
+    "category": "utility"
+  },
+  {
+    "match": "Tokyo Dawn Labs",
+    "field": "vendor",
+    "category": "dynamics"
+  },
+  {
+    "match": "Klanghelm",
+    "field": "vendor",
+    "category": "compressor"
+  },
+  {
+    "match": "Spectrasonics",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "Toontrack",
+    "field": "vendor",
+    "category": "drums"
+  },
+  {
+    "match": "reFX",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "Roland",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "KORG",
+    "field": "vendor",
+    "category": "synth"
+  },
+  {
+    "match": "Antares",
+    "field": "vendor",
+    "category": "pitch"
+  },
+  {
+    "match": "Celemony",
+    "field": "vendor",
+    "category": "pitch"
+  },
+  {
+    "match": "Oeksound",
+    "field": "vendor",
+    "category": "dynamics"
+  },
+  {
+    "match": "de-esser",
+    "field": "nameKeyword",
+    "category": "dynamics"
+  },
+  {
+    "match": "transient",
+    "field": "nameKeyword",
+    "category": "dynamics"
+  },
+  {
+    "match": "maximizer",
+    "field": "nameKeyword",
+    "category": "mastering"
+  },
+  {
+    "match": "exciter",
+    "field": "nameKeyword",
+    "category": "saturation"
+  },
+  {
+    "match": "bitcrush",
+    "field": "nameKeyword",
+    "category": "creative"
+  },
+  {
+    "match": "vocoder",
+    "field": "nameKeyword",
+    "category": "creative"
+  },
+  {
+    "match": "convolution",
+    "field": "nameKeyword",
+    "category": "reverb"
+  }
+]
