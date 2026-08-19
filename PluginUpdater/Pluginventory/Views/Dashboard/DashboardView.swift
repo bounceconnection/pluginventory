@@ -14,6 +14,7 @@ enum SidebarFilter: Hashable {
     case category(PluginCategory)
     case duplicates
     case rosettaRisk
+    case offloaded
 }
 
 /// Wraps a Plugin with its computed update status so the Table can sort all columns.
@@ -73,6 +74,7 @@ struct DashboardView: View {
     @Query(filter: #Predicate<Plugin> { !$0.isRemoved }) private var plugins: [Plugin]
     @Query(filter: #Predicate<AbletonProject> { !$0.isRemoved })
     private var abletonProjects: [AbletonProject]
+    @Query private var offloadedPlugins: [OffloadedPlugin]
     @State private var sidebarSelection: SidebarFilter = .all
     @State private var searchText = ""
     @State private var debouncedSearchText = ""
@@ -82,6 +84,7 @@ struct DashboardView: View {
     @State private var showInspector = false
     @State private var selectedProjectForDetail: AbletonProject?
     @State private var showInsights = false
+    @State private var pendingOffloadIDs: Set<PersistentIdentifier>?
 
     /// Maps persisted column name strings to their KeyPathComparator.
     private static let pluginColumnMap: [String: PartialKeyPath<PluginRow>] = [
@@ -209,7 +212,7 @@ struct DashboardView: View {
                 result = result.filter { duplicateReport.duplicatePaths.contains($0.path) }
             case .rosettaRisk:
                 result = result.filter { ArchitectureCompatibility.breaksInMacOS28($0.architectures) }
-            case .allProjects, .projectsMissingPlugins:
+            case .allProjects, .projectsMissingPlugins, .offloaded:
                 break
             }
         }
@@ -394,6 +397,47 @@ struct DashboardView: View {
         }
     }
 
+    private var offloadDialogTitle: String {
+        let n = pendingOffloadIDs?.count ?? 0
+        return "Offload \(n) plugin\(n == 1 ? "" : "s")?"
+    }
+
+    private var offloadedSizeDisplay: String {
+        let total = offloadedPlugins.reduce(Int64(0)) { $0 + $1.sizeBytes }
+        return ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
+    }
+
+    @ViewBuilder
+    private func offloadedListDetail() -> some View {
+        List {
+            Section {
+                ForEach(offloadedPlugins.sorted { $0.offloadedAt > $1.offloadedAt }) { item in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.name)
+                            Text("\(item.vendorName) · \(item.format?.displayName ?? "") · \(item.sizeDisplay)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Restore") {
+                            Task { await appState.restoreOffloaded([item]) }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(.vertical, 2)
+                }
+            } header: {
+                Text("\(offloadedPlugins.count) offloaded · \(offloadedSizeDisplay) reclaimed")
+            }
+        }
+        .overlay {
+            if offloadedPlugins.isEmpty {
+                ContentUnavailableView("Nothing Offloaded", systemImage: "archivebox", description: Text("Right-click plugins and choose Offload to reclaim disk space."))
+            }
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -445,6 +489,12 @@ struct DashboardView: View {
                     Label("Hidden (\(counts.hidden))", systemImage: "eye.slash")
                         .tag(SidebarFilter.hidden)
                 }
+                if !offloadedPlugins.isEmpty {
+                    Section("Storage") {
+                        Label("Offloaded (\(offloadedPlugins.count)) · \(offloadedSizeDisplay) saved", systemImage: "archivebox")
+                            .tag(SidebarFilter.offloaded)
+                    }
+                }
                 if counts.totalProjects > 0 || appState.isProjectScanning || !appState.projectScanDirectories().isEmpty {
                     Section("Projects") {
                         Label("All Projects (\(counts.totalProjects))", systemImage: "doc.text")
@@ -482,6 +532,8 @@ struct DashboardView: View {
                 projectListDetail(
                     projects: abletonProjects.filter { $0.missingPluginCount > 0 }
                 )
+            case .offloaded:
+                offloadedListDetail()
             default:
                 pluginTableDetail(rows: rows, manifest: manifest, rosettaRiskCount: counts.rosettaRisk)
             }
@@ -647,6 +699,12 @@ struct DashboardView: View {
 
                 Divider()
 
+                Button("Offload to Reclaim Space") {
+                    pendingOffloadIDs = ids
+                }
+
+                Divider()
+
                 if sidebarSelection == .hidden {
                     Button("Unhide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
                         setHidden(false, for: ids)
@@ -722,6 +780,23 @@ struct DashboardView: View {
                     .labelStyle(.titleAndIcon)
                 }
             }
+        }
+        .confirmationDialog(
+            offloadDialogTitle,
+            isPresented: Binding(
+                get: { pendingOffloadIDs != nil },
+                set: { if !$0 { pendingOffloadIDs = nil } }
+            ),
+            presenting: pendingOffloadIDs
+        ) { ids in
+            Button("Offload", role: .destructive) {
+                let toOffload = plugins(for: ids)
+                pendingOffloadIDs = nil
+                Task { await appState.offloadPlugins(toOffload) }
+            }
+            Button("Cancel", role: .cancel) { pendingOffloadIDs = nil }
+        } message: { _ in
+            Text("Selected bundles will be moved to ~/PluginventoryOffload to reclaim disk space. You can restore them anytime from the Offloaded list.")
         }
         .sheet(isPresented: $showInsights) {
             NavigationStack {
