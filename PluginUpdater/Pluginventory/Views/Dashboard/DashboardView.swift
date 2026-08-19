@@ -81,6 +81,7 @@ struct DashboardView: View {
     @State private var selectedPluginIDs: Set<PersistentIdentifier> = []
     @State private var showInspector = false
     @State private var selectedProjectForDetail: AbletonProject?
+    @State private var showInsights = false
 
     /// Maps persisted column name strings to their KeyPathComparator.
     private static let pluginColumnMap: [String: PartialKeyPath<PluginRow>] = [
@@ -358,6 +359,20 @@ struct DashboardView: View {
             )
         }
         return DuplicateDetector().analyze(inputs)
+    }
+
+    /// Builds insights analytics data over currently-visible (non-hidden) plugins.
+    private func buildInsightsData() -> InsightsData {
+        let inputs = plugins.compactMap { plugin -> InsightPlugin? in
+            plugin.isHidden ? nil : InsightPlugin(
+                name: plugin.name,
+                vendorName: plugin.vendorName,
+                format: plugin.format,
+                category: plugin.category,
+                fileSize: plugin.fileSize
+            )
+        }
+        return InsightsData.build(from: inputs)
     }
 
     private func categoryIcon(_ category: PluginCategory) -> String {
@@ -694,12 +709,23 @@ struct DashboardView: View {
                         .textFieldStyle(.roundedBorder)
                         .frame(minWidth: 180, idealWidth: 250)
                     Button {
+                        showInsights = true
+                    } label: {
+                        Label("Insights", systemImage: "chart.bar.xaxis")
+                    }
+                    .labelStyle(.titleAndIcon)
+                    Button {
                         showInspector.toggle()
                     } label: {
                         Label("Info", systemImage: "sidebar.trailing")
                     }
                     .labelStyle(.titleAndIcon)
                 }
+            }
+        }
+        .sheet(isPresented: $showInsights) {
+            NavigationStack {
+                InsightsView(data: buildInsightsData())
             }
         }
         .inspector(isPresented: $showInspector) {
