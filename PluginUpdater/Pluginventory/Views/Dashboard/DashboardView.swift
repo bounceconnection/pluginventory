@@ -11,6 +11,9 @@ enum SidebarFilter: Hashable {
     case projectsMissingPlugins
     case usedPlugins
     case unusedPlugins
+    case category(PluginCategory)
+    case duplicates
+    case rosettaRisk
 }
 
 /// Wraps a Plugin with its computed update status so the Table can sort all columns.
@@ -55,8 +58,12 @@ private struct SidebarCounts {
     var projectsMissingPlugins = 0
     var usedPlugins = 0
     var unusedPlugins = 0
+    var categoryCounts: [PluginCategory: Int] = [:]
+    var duplicates = 0
+    var rosettaRisk = 0
 
     func count(for format: PluginFormat) -> Int { formatCounts[format, default: 0] }
+    func count(for category: PluginCategory) -> Int { categoryCounts[category, default: 0] }
 }
 
 @MainActor
@@ -123,7 +130,7 @@ struct DashboardView: View {
     // MARK: - Computed helpers
 
     /// Single-pass sidebar counts — replaces 6+ separate filter iterations.
-    private func computeSidebarCounts(manifest: [String: UpdateManifestEntry]) -> SidebarCounts {
+    private func computeSidebarCounts(manifest: [String: UpdateManifestEntry], duplicateReport: DuplicateReport) -> SidebarCounts {
         var c = SidebarCounts()
         for plugin in plugins {
             if plugin.isHidden {
@@ -131,6 +138,13 @@ struct DashboardView: View {
             } else {
                 c.visible += 1
                 c.formatCounts[plugin.format, default: 0] += 1
+                c.categoryCounts[plugin.category, default: 0] += 1
+                if ArchitectureCompatibility.breaksInMacOS28(plugin.architectures) {
+                    c.rosettaRisk += 1
+                }
+                if duplicateReport.duplicatePaths.contains(plugin.path) {
+                    c.duplicates += 1
+                }
                 if let entry = manifest[plugin.bundleIdentifier],
                    !entry.latestVersion.isEmpty,
                    entry.latestVersion.isNewerVersion(than: plugin.currentVersion) {
@@ -162,7 +176,7 @@ struct DashboardView: View {
     }
 
     /// Filtered + sorted rows for the Table, computed once per body evaluation.
-    private func computeRows(manifest: [String: UpdateManifestEntry], projectCounts: [String: Int], instanceCounts: [String: Int]) -> [PluginRow] {
+    private func computeRows(manifest: [String: UpdateManifestEntry], projectCounts: [String: Int], instanceCounts: [String: Int], duplicateReport: DuplicateReport) -> [PluginRow] {
         var result = plugins
 
         if sidebarSelection == .hidden {
@@ -188,6 +202,12 @@ struct DashboardView: View {
             case .unusedPlugins:
                 let usedNames = collectUsedPluginNames()
                 result = result.filter { !usedNames.contains($0.name.lowercased()) }
+            case .category(let category):
+                result = result.filter { $0.category == category }
+            case .duplicates:
+                result = result.filter { duplicateReport.duplicatePaths.contains($0.path) }
+            case .rosettaRisk:
+                result = result.filter { ArchitectureCompatibility.breaksInMacOS28($0.architectures) }
             case .allProjects, .projectsMissingPlugins:
                 break
             }
@@ -326,14 +346,48 @@ struct DashboardView: View {
         return (projectCounts, instanceCounts)
     }
 
+    /// Builds the duplicate report over currently-visible (non-hidden) plugins.
+    private func computeDuplicateReport() -> DuplicateReport {
+        let inputs = plugins.compactMap { plugin -> DuplicatePluginInput? in
+            plugin.isHidden ? nil : DuplicatePluginInput(
+                name: plugin.name,
+                vendorName: plugin.vendorName,
+                bundleIdentifier: plugin.bundleIdentifier,
+                format: plugin.format,
+                path: plugin.path
+            )
+        }
+        return DuplicateDetector().analyze(inputs)
+    }
+
+    private func categoryIcon(_ category: PluginCategory) -> String {
+        switch category {
+        case .synth, .sampler: return "pianokeys"
+        case .drums: return "metronome"
+        case .eq, .filter: return "slider.horizontal.3"
+        case .dynamics, .compressor: return "waveform.path"
+        case .saturation, .distortion: return "flame"
+        case .reverb, .delay: return "wave.3.right"
+        case .modulation, .creative: return "sparkles"
+        case .pitch: return "tuningfork"
+        case .mastering, .channelStrip: return "slider.vertical.3"
+        case .metering, .analyzer: return "waveform"
+        case .utility: return "wrench.and.screwdriver"
+        case .guitarAmp: return "guitars"
+        case .noiseReduction: return "speaker.slash"
+        case .uncategorized: return "square.dashed"
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
         // Compute once per body evaluation — reused by Table, overlay, and sidebar.
         let manifest = appState.manifestEntries
-        let counts = computeSidebarCounts(manifest: manifest)
+        let duplicateReport = computeDuplicateReport()
+        let counts = computeSidebarCounts(manifest: manifest, duplicateReport: duplicateReport)
         let usageData = computePluginUsageData()
-        let rows = computeRows(manifest: manifest, projectCounts: usageData.projects, instanceCounts: usageData.instances)
+        let rows = computeRows(manifest: manifest, projectCounts: usageData.projects, instanceCounts: usageData.instances, duplicateReport: duplicateReport)
 
         NavigationSplitView {
             List(selection: $sidebarSelection) {
@@ -348,6 +402,28 @@ struct DashboardView: View {
                     ForEach(PluginFormat.allCases) { format in
                         Label("\(format.displayName) (\(counts.count(for: format)))", systemImage: "puzzlepiece.extension")
                             .tag(SidebarFilter.format(format))
+                    }
+                }
+                if counts.rosettaRisk > 0 {
+                    Section("Compatibility") {
+                        Label("Won't run in macOS 28 (\(counts.rosettaRisk))", systemImage: "exclamationmark.triangle.fill")
+                            .tag(SidebarFilter.rosettaRisk)
+                            .foregroundStyle(.orange)
+                    }
+                }
+                Section("Categories") {
+                    ForEach(PluginCategory.allCases) { category in
+                        let categoryCount = counts.count(for: category)
+                        if categoryCount > 0 {
+                            Label("\(category.displayName) (\(categoryCount))", systemImage: categoryIcon(category))
+                                .tag(SidebarFilter.category(category))
+                        }
+                    }
+                }
+                if counts.duplicates > 0 {
+                    Section("Cleanup") {
+                        Label("Duplicates (\(counts.duplicates))", systemImage: "square.on.square")
+                            .tag(SidebarFilter.duplicates)
                     }
                 }
                 Section("Manage") {
@@ -392,7 +468,7 @@ struct DashboardView: View {
                     projects: abletonProjects.filter { $0.missingPluginCount > 0 }
                 )
             default:
-                pluginTableDetail(rows: rows, manifest: manifest)
+                pluginTableDetail(rows: rows, manifest: manifest, rosettaRiskCount: counts.rosettaRisk)
             }
         }
         .frame(minWidth: 700, minHeight: 400)
@@ -457,7 +533,7 @@ struct DashboardView: View {
     // MARK: - Plugin Table Detail
 
     @ViewBuilder
-    private func pluginTableDetail(rows: [PluginRow], manifest: [String: UpdateManifestEntry]) -> some View {
+    private func pluginTableDetail(rows: [PluginRow], manifest: [String: UpdateManifestEntry], rosettaRiskCount: Int) -> some View {
         Table(rows, selection: $selectedPluginIDs, sortOrder: $sortOrder) {
             Group {
                 TableColumn("Name", value: \PluginRow.name) { (row: PluginRow) in
@@ -528,6 +604,13 @@ struct DashboardView: View {
         }
         .background(NSTableViewFinder.enableColumnAutoResize())
         .id(sidebarSelection)
+        .safeAreaInset(edge: .top) {
+            if rosettaRiskCount > 0 && sidebarSelection != .rosettaRisk {
+                RosettaWarningBanner(count: rosettaRiskCount) {
+                    sidebarSelection = .rosettaRisk
+                }
+            }
+        }
         .contextMenu(forSelectionType: PersistentIdentifier.self) { ids in
             if !ids.isEmpty {
                 let count = ids.count
