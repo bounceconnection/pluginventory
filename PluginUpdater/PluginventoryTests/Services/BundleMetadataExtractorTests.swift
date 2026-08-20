@@ -77,6 +77,23 @@ struct BundleMetadataExtractorTests {
         #expect(metadata.vendorName == "FabFilter")
     }
 
+    @Test("Does not compute bundle size during extraction")
+    func doesNotComputeSizeDuringScan() throws {
+        // Size is resolved lazily by BundleSizeService, not during the scan,
+        // so extraction must leave it nil (the dominant scan cost is removed).
+        let plist: [String: Any] = [
+            "CFBundleIdentifier": "com.test.plugin",
+            "CFBundleName": "Test",
+            "CFBundleShortVersionString": "1.0.0"
+        ]
+
+        let bundleURL = try createMockBundle(name: "Test", extension: "vst3", plist: plist)
+        defer { cleanup(bundleURL) }
+
+        let metadata = try BundleMetadataExtractor.extract(from: bundleURL)
+        #expect(metadata.fileSize == nil)
+    }
+
     @Test("Extracts metadata from CLAP bundle")
     func extractsCLAPMetadata() throws {
         let plist: [String: Any] = [

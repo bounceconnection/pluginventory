@@ -15,7 +15,8 @@ struct PluginReconcilerTests {
         bundleID: String = "com.test.plugin",
         version: String = "1.0.0",
         format: PluginFormat = .vst3,
-        vendor: String = "TestVendor"
+        vendor: String = "TestVendor",
+        fileSize: Int64? = 1024
     ) -> PluginMetadata {
         PluginMetadata(
             url: URL(fileURLWithPath: "/Library/Audio/Plug-Ins/VST3/\(name).vst3"),
@@ -31,7 +32,7 @@ struct PluginReconcilerTests {
             parentDirectory: "VST3",
             plistFields: [:],
             architectures: [.arm64, .x86_64],
-            fileSize: 1024,
+            fileSize: fileSize,
             fileCreationDate: nil
         )
     }
@@ -66,6 +67,51 @@ struct PluginReconcilerTests {
         // Verify initial version history was created
         let versions = try context.fetch(FetchDescriptor<PluginVersion>())
         #expect(versions.count == 2)
+    }
+
+    @Test("Preserves stored size when scan metadata has no size")
+    func preservesSizeWhenMetadataSizeNil() async throws {
+        let container = try makeContainer()
+
+        // Pre-populate a plugin with a known, previously computed size.
+        let context = ModelContext(container)
+        let existing = Plugin(
+            name: "Synth1",
+            bundleIdentifier: "com.test.synth1",
+            format: .vst3,
+            currentVersion: "1.0.0",
+            path: "/Library/Audio/Plug-Ins/VST3/Synth1.vst3",
+            vendorName: "TestVendor"
+        )
+        existing.fileSize = 5_000_000
+        context.insert(existing)
+        try context.save()
+
+        // Reconcile with metadata that carries no size (the new scan behavior).
+        let reconciler = PluginReconciler(modelContainer: container)
+        _ = try await reconciler.reconcile(scannedPlugins: [
+            makeMetadata(name: "Synth1", bundleID: "com.test.synth1", version: "1.0.0", fileSize: nil)
+        ])
+
+        let verifyContext = ModelContext(container)
+        let plugins = try verifyContext.fetch(FetchDescriptor<Plugin>())
+        let synth = try #require(plugins.first { $0.bundleIdentifier == "com.test.synth1" })
+        #expect(synth.fileSize == 5_000_000)
+    }
+
+    @Test("Applies size when scan metadata provides one")
+    func appliesSizeWhenMetadataSizePresent() async throws {
+        let container = try makeContainer()
+        let reconciler = PluginReconciler(modelContainer: container)
+
+        _ = try await reconciler.reconcile(scannedPlugins: [
+            makeMetadata(name: "Synth1", bundleID: "com.test.synth1", fileSize: 2_048)
+        ])
+
+        let context = ModelContext(container)
+        let plugins = try context.fetch(FetchDescriptor<Plugin>())
+        let synth = try #require(plugins.first { $0.bundleIdentifier == "com.test.synth1" })
+        #expect(synth.fileSize == 2_048)
     }
 
     @Test("Detects version updates and records history")

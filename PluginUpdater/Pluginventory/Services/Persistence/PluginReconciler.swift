@@ -143,7 +143,11 @@ actor PluginReconciler {
         existing.path = metadata.url.path
         existing.name = metadata.name
         existing.architectures = metadata.architectures
-        existing.fileSize = metadata.fileSize
+        // Preserve the background-computed size when the scan didn't produce one
+        // (the scan no longer walks bundle contents — see BundleSizeService).
+        if let size = metadata.fileSize {
+            existing.fileSize = size
+        }
         existing.fileCreationDate = metadata.fileCreationDate
 
         // Plugin reappeared after being removed
@@ -196,7 +200,9 @@ actor PluginReconciler {
         )
 
         plugin.architectures = metadata.architectures
-        plugin.fileSize = metadata.fileSize
+        if let size = metadata.fileSize {
+            plugin.fileSize = size
+        }
         plugin.fileCreationDate = metadata.fileCreationDate
 
         // Initial version record

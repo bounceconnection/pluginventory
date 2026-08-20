@@ -16,6 +16,9 @@ final class Plugin {
     /// Comma-separated architecture raw values (e.g. "arm64,x86_64").
     var architecturesRaw: String = ""
     var fileSize: Int64 = 0
+    /// Bundle modification date `fileSize` was last computed for.
+    /// Lets `BundleSizeService` skip re-walking unchanged bundles across scans.
+    var sizeCacheMtime: Date?
     var fileCreationDate: Date?
 
     @Relationship(deleteRule: .cascade, inverse: \PluginVersion.plugin)

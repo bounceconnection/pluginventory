@@ -30,7 +30,9 @@ final class AppState {
     private let vendorURLResolver = VendorURLResolver()
     private let appUpdateChecker = AppUpdateChecker()
     private let manifestCacheManager = ManifestCacheManager()
+    private let bundleSizeService = BundleSizeService()
     private var prefetchTask: Task<Void, Never>?
+    private var sizeComputationTask: Task<Void, Never>?
 
     /// Plist fields from most recent scan, keyed by bundleID.
     /// Used by VendorURLResolver for URL extraction from plist metadata.
@@ -268,6 +270,9 @@ final class AppState {
                 NotificationManager.shared.notifyChanges(result.changes)
             }
 
+            // Resolve bundle sizes in the background (off the scan critical path)
+            startSizeComputation()
+
             // Check for available updates + resolve vendor URLs
             await checkForUpdates()
 
@@ -306,6 +311,9 @@ final class AppState {
             let result = try await reconciler.reconcile(scannedPlugins: scanResult.plugins, fullScan: false)
 
             applyResult(result, errors: scanResult.errors)
+
+            // Refresh sizes for any changed bundles (mtime cache skips the rest)
+            startSizeComputation()
 
             // Notify for incremental changes
             NotificationManager.shared.notifyChanges(result.changes)
@@ -463,6 +471,62 @@ final class AppState {
                     AppLogger.shared.info("Image prefetch complete", category: "images")
                 }
             }
+        }
+    }
+
+    // MARK: - Bundle Sizes
+
+    /// Starts (or restarts) the background bundle-size pass.
+    ///
+    /// Size is computed off the scan critical path so the plugin list appears
+    /// immediately after a scan. Results are cached per bundle modification date,
+    /// so this is near-instant on rescans where nothing changed.
+    func startSizeComputation() {
+        sizeComputationTask?.cancel()
+        sizeComputationTask = Task { [weak self] in
+            await self?.computePluginSizes()
+        }
+    }
+
+    /// Cancels any running background size pass.
+    func cancelSizeComputation() {
+        sizeComputationTask?.cancel()
+        sizeComputationTask = nil
+    }
+
+    /// Computes bundle sizes for all present plugins and writes them back,
+    /// skipping bundles whose modification date matches the cached value.
+    private func computePluginSizes() async {
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<Plugin>(
+            predicate: #Predicate { !$0.isRemoved }
+        )
+        guard let plugins = try? context.fetch(descriptor), !plugins.isEmpty else { return }
+
+        let requests = plugins.map { plugin in
+            BundleSizeService.SizeRequest(
+                path: plugin.path,
+                cachedMtime: plugin.sizeCacheMtime,
+                cachedSize: plugin.fileSize
+            )
+        }
+
+        let results = await bundleSizeService.computeSizes(requests)
+        if Task.isCancelled { return }
+
+        var changed = false
+        for plugin in plugins {
+            guard let result = results[plugin.path] else { continue }
+            if plugin.fileSize != result.size || plugin.sizeCacheMtime != result.mtime {
+                plugin.fileSize = result.size
+                plugin.sizeCacheMtime = result.mtime
+                changed = true
+            }
+        }
+
+        if changed {
+            try? context.save()
+            AppLogger.shared.info("Bundle sizes updated for \(plugins.count) plugins", category: "scan")
         }
     }
 

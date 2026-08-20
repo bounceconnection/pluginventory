@@ -19,7 +19,9 @@ struct PluginMetadata: Sendable {
     let plistFields: [String: String]
 
     let architectures: [CPUArchitecture]
-    let fileSize: Int64
+    /// Total bundle size in bytes. `nil` when not computed during the scan —
+    /// size is resolved lazily off the critical path by `BundleSizeService`.
+    let fileSize: Int64?
     let fileCreationDate: Date?
 }
 
@@ -72,10 +74,13 @@ enum BundleMetadataExtractor {
         let executableName = plist["CFBundleExecutable"] as? String
         let architectures = ArchitectureDetector.detect(bundleURL: bundleURL, executableName: executableName)
 
-        // Bundle size: sum all files in the bundle
-        let fileSize = Self.calculateBundleSize(bundleURL)
+        // NOTE: Bundle size is deliberately NOT computed here. Recursively summing
+        // every file inside every bundle was the dominant scan cost (audio plugins
+        // ship huge sample/preset trees). Size is resolved lazily, cached by bundle
+        // modification date, via `BundleSizeService` after the scan completes.
+        let fileSize: Int64? = nil
 
-        // File creation date
+        // File creation date (single stat — cheap)
         let fileCreationDate = Self.getCreationDate(bundleURL)
 
         return PluginMetadata(
@@ -150,25 +155,6 @@ enum BundleMetadataExtractor {
         let parts = bundleID.split(separator: ".")
         guard parts.count >= 2 else { return nil }
         return String(parts[1])
-    }
-
-    /// Calculates the total size of all files in a bundle directory.
-    private static func calculateBundleSize(_ bundleURL: URL) -> Int64 {
-        let fm = FileManager.default
-        guard let enumerator = fm.enumerator(
-            at: bundleURL,
-            includingPropertiesForKeys: [.fileSizeKey],
-            options: [.skipsHiddenFiles]
-        ) else { return 0 }
-
-        var total: Int64 = 0
-        for case let fileURL as URL in enumerator {
-            if let values = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
-               let size = values.fileSize {
-                total += Int64(size)
-            }
-        }
-        return total
     }
 
     /// Gets the filesystem creation date of a bundle.
