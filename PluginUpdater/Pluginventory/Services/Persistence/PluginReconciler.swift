@@ -4,6 +4,8 @@ import SwiftData
 @ModelActor
 actor PluginReconciler {
 
+    private static let categoryClassifier = PluginCategoryClassifier.loadFromBundle()
+
     struct ReconciliationResult: Sendable {
         let newPlugins: Int
         let updatedPlugins: Int
@@ -149,6 +151,11 @@ actor PluginReconciler {
             existing.fileSize = size
         }
         existing.fileCreationDate = metadata.fileCreationDate
+        existing.category = Self.categoryClassifier.classify(
+            bundleID: metadata.bundleIdentifier,
+            vendorName: metadata.vendorName,
+            name: metadata.name
+        )
 
         // Plugin reappeared after being removed
         if existing.isRemoved {
@@ -204,6 +211,11 @@ actor PluginReconciler {
             plugin.fileSize = size
         }
         plugin.fileCreationDate = metadata.fileCreationDate
+        plugin.category = Self.categoryClassifier.classify(
+            bundleID: metadata.bundleIdentifier,
+            vendorName: metadata.vendorName,
+            name: metadata.name
+        )
 
         // Initial version record
         let initialVersion = PluginVersion(version: metadata.version)
