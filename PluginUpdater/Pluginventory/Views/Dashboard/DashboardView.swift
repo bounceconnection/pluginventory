@@ -601,6 +601,47 @@ struct DashboardView: View {
 
     @ViewBuilder
     private func pluginTableDetail(rows: [PluginRow], manifest: [String: UpdateManifestEntry], rosettaRiskCount: Int) -> some View {
+        pluginTable(rows: rows, manifest: manifest)
+            .background(NSTableViewFinder.enableColumnAutoResize())
+            .id(sidebarSelection)
+            .safeAreaInset(edge: .top) {
+                rosettaBanner(rosettaRiskCount: rosettaRiskCount)
+            }
+            .safeAreaInset(edge: .bottom) {
+                statusFooter(rowCount: rows.count)
+            }
+            .toolbar {
+                pluginTableToolbar()
+            }
+            .confirmationDialog(
+                offloadDialogTitle,
+                isPresented: offloadDialogBinding,
+                presenting: pendingOffloadIDs
+            ) { ids in
+                offloadDialogActions(ids)
+            } message: { _ in
+                Text("Selected bundles will be moved to ~/PluginventoryOffload to reclaim disk space. You can restore them anytime from the Offloaded list.")
+            }
+            .sheet(isPresented: $showInsights) {
+                NavigationStack {
+                    InsightsView(data: buildInsightsData())
+                }
+            }
+            .inspector(isPresented: $showInspector) {
+                inspectorContent()
+            }
+            .onChange(of: searchText) { _, newValue in
+                handleSearchChange(newValue)
+            }
+            .onChange(of: selectedPluginIDs) { _, newValue in
+                if !newValue.isEmpty {
+                    showInspector = true
+                }
+            }
+    }
+
+    @ViewBuilder
+    private func pluginTable(rows: [PluginRow], manifest: [String: UpdateManifestEntry]) -> some View {
         Table(rows, selection: $selectedPluginIDs, sortOrder: $sortOrder) {
             Group {
                 TableColumn("Name", value: \PluginRow.name) { (row: PluginRow) in
@@ -669,165 +710,166 @@ struct DashboardView: View {
                 .width(min: 50, ideal: 70, max: 90)
             }
         }
-        .background(NSTableViewFinder.enableColumnAutoResize())
-        .id(sidebarSelection)
-        .safeAreaInset(edge: .top) {
-            if rosettaRiskCount > 0 && sidebarSelection != .rosettaRisk {
-                RosettaWarningBanner(count: rosettaRiskCount) {
-                    sidebarSelection = .rosettaRisk
-                }
-            }
-        }
         .contextMenu(forSelectionType: PersistentIdentifier.self) { ids in
-            if !ids.isEmpty {
-                let count = ids.count
-                Button("Copy Path\(count > 1 ? "s" : "")") {
-                    copyPaths(for: ids)
-                }
-                Button("Copy Full Details") {
-                    copyFullDetails(for: ids, manifest: manifest)
-                }
-
-                Divider()
-
-                Button("Reveal in Finder") {
-                    revealInFinder(ids: ids)
-                }
-                Button("Open Publisher Website") {
-                    openVendorWebsites(for: ids, manifest: manifest)
-                }
-
-                Divider()
-
-                Button("Offload to Reclaim Space") {
-                    pendingOffloadIDs = ids
-                }
-
-                Divider()
-
-                if sidebarSelection == .hidden {
-                    Button("Unhide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
-                        setHidden(false, for: ids)
-                    }
-                } else {
-                    Button("Hide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
-                        setHidden(true, for: ids)
-                    }
-                }
-            }
+            rowContextMenu(ids, manifest: manifest)
         }
         .overlay {
-            if plugins.isEmpty && !appState.isScanning {
-                ContentUnavailableView("No Plugins Found", systemImage: "puzzlepiece.extension", description: Text("Run a scan to discover your audio plugins."))
-            } else if rows.isEmpty && !debouncedSearchText.isEmpty {
-                ContentUnavailableView.search(text: debouncedSearchText)
-            } else if rows.isEmpty && sidebarSelection == .hidden {
-                ContentUnavailableView("No Hidden Plugins", systemImage: "eye.slash", description: Text("Right-click a plugin and choose Hide to hide it here."))
+            tableEmptyOverlay(rows: rows)
+        }
+    }
+
+    @ViewBuilder
+    private func rowContextMenu(_ ids: Set<PersistentIdentifier>, manifest: [String: UpdateManifestEntry]) -> some View {
+        if !ids.isEmpty {
+            let count = ids.count
+            Button("Copy Path\(count > 1 ? "s" : "")") {
+                copyPaths(for: ids)
+            }
+            Button("Copy Full Details") {
+                copyFullDetails(for: ids, manifest: manifest)
+            }
+            Divider()
+            Button("Reveal in Finder") {
+                revealInFinder(ids: ids)
+            }
+            Button("Open Publisher Website") {
+                openVendorWebsites(for: ids, manifest: manifest)
+            }
+            Divider()
+            Button("Offload to Reclaim Space") {
+                pendingOffloadIDs = ids
+            }
+            Divider()
+            if sidebarSelection == .hidden {
+                Button("Unhide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
+                    setHidden(false, for: ids)
+                }
+            } else {
+                Button("Hide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
+                    setHidden(true, for: ids)
+                }
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            HStack {
-                Text(statusBarText(rowCount: rows.count))
+    }
+
+    @ViewBuilder
+    private func tableEmptyOverlay(rows: [PluginRow]) -> some View {
+        if plugins.isEmpty && !appState.isScanning {
+            ContentUnavailableView("No Plugins Found", systemImage: "puzzlepiece.extension", description: Text("Run a scan to discover your audio plugins."))
+        } else if rows.isEmpty && !debouncedSearchText.isEmpty {
+            ContentUnavailableView.search(text: debouncedSearchText)
+        } else if rows.isEmpty && sidebarSelection == .hidden {
+            ContentUnavailableView("No Hidden Plugins", systemImage: "eye.slash", description: Text("Right-click a plugin and choose Hide to hide it here."))
+        }
+    }
+
+    @ViewBuilder
+    private func rosettaBanner(rosettaRiskCount: Int) -> some View {
+        if rosettaRiskCount > 0 && sidebarSelection != .rosettaRisk {
+            RosettaWarningBanner(count: rosettaRiskCount) {
+                sidebarSelection = .rosettaRisk
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func statusFooter(rowCount: Int) -> some View {
+        HStack {
+            Text(statusBarText(rowCount: rowCount))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+            if let lastRefresh = appState.lastManifestRefresh {
+                Text("Updates checked \(lastRefresh, format: .relative(presentation: .named))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Spacer()
-                if let lastRefresh = appState.lastManifestRefresh {
-                    Text("Updates checked \(lastRefresh, format: .relative(presentation: .named))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(.bar)
-        }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                if appState.isScanning {
-                    ProgressView(value: appState.scanProgress)
-                        .progressViewStyle(.circular)
-                        .controlSize(.regular)
-                } else {
-                    Button {
-                        Task { await appState.performScan() }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Text(statusSubtitle)
-                                .font(.caption)
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                    }
-                }
-            }
-            ToolbarItem(placement: .primaryAction) {
-                HStack(spacing: 8) {
-                    TextField("Search plugins or vendors", text: $searchText)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(minWidth: 180, idealWidth: 250)
-                    Button {
-                        showInsights = true
-                    } label: {
-                        Label("Insights", systemImage: "chart.bar.xaxis")
-                    }
-                    .labelStyle(.titleAndIcon)
-                    Button {
-                        showInspector.toggle()
-                    } label: {
-                        Label("Info", systemImage: "sidebar.trailing")
-                    }
-                    .labelStyle(.titleAndIcon)
-                }
             }
         }
-        .confirmationDialog(
-            offloadDialogTitle,
-            isPresented: Binding(
-                get: { pendingOffloadIDs != nil },
-                set: { if !$0 { pendingOffloadIDs = nil } }
-            ),
-            presenting: pendingOffloadIDs
-        ) { ids in
-            Button("Offload", role: .destructive) {
-                let toOffload = plugins(for: ids)
-                pendingOffloadIDs = nil
-                Task { await appState.offloadPlugins(toOffload) }
-            }
-            Button("Cancel", role: .cancel) { pendingOffloadIDs = nil }
-        } message: { _ in
-            Text("Selected bundles will be moved to ~/PluginventoryOffload to reclaim disk space. You can restore them anytime from the Offloaded list.")
-        }
-        .sheet(isPresented: $showInsights) {
-            NavigationStack {
-                InsightsView(data: buildInsightsData())
-            }
-        }
-        .inspector(isPresented: $showInspector) {
-            if let plugin = selectedPlugin {
-                PluginDetailView(plugin: plugin, manifest: appState.manifestEntries)
-                    .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(.bar)
+    }
+
+    @ToolbarContentBuilder
+    private func pluginTableToolbar() -> some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            if appState.isScanning {
+                ProgressView(value: appState.scanProgress)
+                    .progressViewStyle(.circular)
+                    .controlSize(.regular)
             } else {
-                ContentUnavailableView("No Selection", systemImage: "cursorarrow.click", description: Text("Select a plugin to view its details."))
-                    .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
-            }
-        }
-        .onChange(of: searchText) { _, newValue in
-            searchTask?.cancel()
-            if newValue.isEmpty {
-                debouncedSearchText = ""
-            } else {
-                searchTask = Task {
-                    try? await Task.sleep(nanoseconds: 300_000_000)
-                    if !Task.isCancelled {
-                        debouncedSearchText = newValue
+                Button {
+                    Task { await appState.performScan() }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(statusSubtitle)
+                            .font(.caption)
+                        Image(systemName: "arrow.clockwise")
                     }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
                 }
             }
         }
-        .onChange(of: selectedPluginIDs) { _, newValue in
-            if !newValue.isEmpty {
-                showInspector = true
+        ToolbarItem(placement: .primaryAction) {
+            HStack(spacing: 8) {
+                TextField("Search plugins or vendors", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(minWidth: 180, idealWidth: 250)
+                Button {
+                    showInsights = true
+                } label: {
+                    Label("Insights", systemImage: "chart.bar.xaxis")
+                }
+                .labelStyle(.titleAndIcon)
+                Button {
+                    showInspector.toggle()
+                } label: {
+                    Label("Info", systemImage: "sidebar.trailing")
+                }
+                .labelStyle(.titleAndIcon)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func offloadDialogActions(_ ids: Set<PersistentIdentifier>) -> some View {
+        Button("Offload", role: .destructive) {
+            let toOffload = plugins(for: ids)
+            pendingOffloadIDs = nil
+            Task { await appState.offloadPlugins(toOffload) }
+        }
+        Button("Cancel", role: .cancel) { pendingOffloadIDs = nil }
+    }
+
+    private var offloadDialogBinding: Binding<Bool> {
+        Binding(
+            get: { pendingOffloadIDs != nil },
+            set: { if !$0 { pendingOffloadIDs = nil } }
+        )
+    }
+
+    @ViewBuilder
+    private func inspectorContent() -> some View {
+        if let plugin = selectedPlugin {
+            PluginDetailView(plugin: plugin, manifest: appState.manifestEntries)
+                .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+        } else {
+            ContentUnavailableView("No Selection", systemImage: "cursorarrow.click", description: Text("Select a plugin to view its details."))
+                .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+        }
+    }
+
+    private func handleSearchChange(_ newValue: String) {
+        searchTask?.cancel()
+        if newValue.isEmpty {
+            debouncedSearchText = ""
+        } else {
+            searchTask = Task {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                if !Task.isCancelled {
+                    debouncedSearchText = newValue
+                }
             }
         }
     }
