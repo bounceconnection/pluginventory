@@ -392,6 +392,27 @@ final class AppState {
         return csv
     }
 
+    /// Builds a multi-page PDF of the current plugin inventory.
+    func exportPluginInventoryPDFData() -> Data {
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<Plugin>(
+            predicate: #Predicate { !$0.isRemoved },
+            sortBy: [SortDescriptor(\.name)]
+        )
+        guard let plugins = try? context.fetch(descriptor) else { return Data() }
+        let rows = plugins.map { plugin in
+            PluginInventoryPDF.Row(
+                name: plugin.name,
+                vendor: plugin.vendorName,
+                format: plugin.format.displayName,
+                version: plugin.currentVersion,
+                category: plugin.category.displayName,
+                size: ByteCountFormatter.string(fromByteCount: plugin.fileSize, countStyle: .file)
+            )
+        }
+        return PluginInventoryPDF.generate(title: "Plugin Inventory", rows: rows, generatedAt: Date())
+    }
+
     // MARK: - Image Prefetching
 
     /// Cancels any running image prefetch task.

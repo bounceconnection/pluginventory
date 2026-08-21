@@ -15,6 +15,7 @@ enum SidebarFilter: Hashable {
     case duplicates
     case rosettaRisk
     case offloaded
+    case manufacturer(String)
 }
 
 /// Wraps a Plugin with its computed update status so the Table can sort all columns.
@@ -60,11 +61,13 @@ private struct SidebarCounts {
     var usedPlugins = 0
     var unusedPlugins = 0
     var categoryCounts: [PluginCategory: Int] = [:]
+    var manufacturerCounts: [String: Int] = [:]
     var duplicates = 0
     var rosettaRisk = 0
 
     func count(for format: PluginFormat) -> Int { formatCounts[format, default: 0] }
     func count(for category: PluginCategory) -> Int { categoryCounts[category, default: 0] }
+    func count(forManufacturer name: String) -> Int { manufacturerCounts[name, default: 0] }
 }
 
 @MainActor
@@ -143,6 +146,7 @@ struct DashboardView: View {
                 c.visible += 1
                 c.formatCounts[plugin.format, default: 0] += 1
                 c.categoryCounts[plugin.category, default: 0] += 1
+                c.manufacturerCounts[plugin.vendorName, default: 0] += 1
                 if ArchitectureCompatibility.breaksInMacOS28(plugin.architectures) {
                     c.rosettaRisk += 1
                 }
@@ -212,6 +216,8 @@ struct DashboardView: View {
                 result = result.filter { duplicateReport.duplicatePaths.contains($0.path) }
             case .rosettaRisk:
                 result = result.filter { ArchitectureCompatibility.breaksInMacOS28($0.architectures) }
+            case .manufacturer(let name):
+                result = result.filter { $0.vendorName == name }
             case .allProjects, .projectsMissingPlugins, .offloaded:
                 break
             }
@@ -402,6 +408,53 @@ struct DashboardView: View {
         return "Offload \(n) plugin\(n == 1 ? "" : "s")?"
     }
 
+    @ViewBuilder
+    private func manufacturersSection(_ counts: SidebarCounts) -> some View {
+        let ranked = counts.manufacturerCounts
+            .sorted { $0.value != $1.value ? $0.value > $1.value : $0.key < $1.key }
+            .map { $0.key }
+        if !ranked.isEmpty {
+            Section("Manufacturers") {
+                ForEach(ranked, id: \.self) { name in
+                    Label("\(name) (\(counts.count(forManufacturer: name)))", systemImage: "building.2")
+                        .tag(SidebarFilter.manufacturer(name))
+                }
+            }
+        }
+    }
+
+    private func buildVendorUpdateGroups(manifest: [String: UpdateManifestEntry]) -> [VendorUpdateGroup] {
+        var byVendor: [String: [UpdateRowInfo]] = [:]
+        for plugin in plugins where !plugin.isHidden {
+            guard let entry = manifest[plugin.bundleIdentifier],
+                  !entry.latestVersion.isEmpty,
+                  entry.latestVersion.isNewerVersion(than: plugin.currentVersion) else { continue }
+            if !debouncedSearchText.isEmpty,
+               !(plugin.name.localizedCaseInsensitiveContains(debouncedSearchText) ||
+                 plugin.vendorName.localizedCaseInsensitiveContains(debouncedSearchText)) {
+                continue
+            }
+            let info = UpdateRowInfo(
+                id: plugin.path,
+                name: plugin.name,
+                currentVersion: plugin.currentVersion,
+                availableVersion: entry.latestVersion,
+                downloadURL: entry.downloadURL,
+                architectures: plugin.architectures
+            )
+            byVendor[plugin.vendorName, default: []].append(info)
+        }
+        return byVendor
+            .map { VendorUpdateGroup(id: $0.key, vendor: $0.key, rows: $0.value.sorted { $0.name < $1.name }) }
+            .sorted { $0.vendor.lowercased() < $1.vendor.lowercased() }
+    }
+
+    @ViewBuilder
+    private func updatesGroupedDetail(manifest: [String: UpdateManifestEntry]) -> some View {
+        UpdatesGroupedView(groups: buildVendorUpdateGroups(manifest: manifest))
+            .toolbar { pluginTableToolbar() }
+    }
+
     private var offloadedSizeDisplay: String {
         let total = offloadedPlugins.reduce(Int64(0)) { $0 + $1.sizeBytes }
         return ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
@@ -479,6 +532,7 @@ struct DashboardView: View {
                         }
                     }
                 }
+                manufacturersSection(counts)
                 if counts.duplicates > 0 {
                     Section("Cleanup") {
                         Label("Duplicates (\(counts.duplicates))", systemImage: "square.on.square")
@@ -534,6 +588,8 @@ struct DashboardView: View {
                 )
             case .offloaded:
                 offloadedListDetail()
+            case .updatesAvailable:
+                updatesGroupedDetail(manifest: manifest)
             default:
                 pluginTableDetail(rows: rows, manifest: manifest, rosettaRiskCount: counts.rosettaRisk)
             }
