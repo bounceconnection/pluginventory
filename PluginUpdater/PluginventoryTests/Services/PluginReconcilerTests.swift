@@ -37,6 +37,22 @@ struct PluginReconcilerTests {
         )
     }
 
+    @Test("Assigns a category to scanned plugins")
+    func assignsCategory() async throws {
+        let container = try makeContainer()
+        let reconciler = PluginReconciler(modelContainer: container)
+        let meta = makeMetadata(name: "Reverb Deluxe", bundleID: "com.test.reverbdeluxe", vendor: "TestVendor")
+        _ = try await reconciler.reconcile(scannedPlugins: [meta])
+
+        let context = ModelContext(container)
+        let plugins = try context.fetch(FetchDescriptor<Plugin>())
+        let plugin = try #require(plugins.first { $0.bundleIdentifier == "com.test.reverbdeluxe" })
+        let expected = PluginCategoryClassifier.loadFromBundle().classify(
+            bundleID: meta.bundleIdentifier, vendorName: meta.vendorName, name: meta.name
+        )
+        #expect(plugin.category == expected)
+    }
+
     @Test("Detects new plugins and creates version history")
     func detectsNewPlugins() async throws {
         let container = try makeContainer()

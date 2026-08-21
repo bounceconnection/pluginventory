@@ -20,6 +20,8 @@ final class Plugin {
     /// Lets `BundleSizeService` skip re-walking unchanged bundles across scans.
     var sizeCacheMtime: Date?
     var fileCreationDate: Date?
+    /// Functional category (raw value), assigned by PluginCategoryClassifier.
+    var categoryRaw: String = PluginCategory.uncategorized.rawValue
 
     @Relationship(deleteRule: .cascade, inverse: \PluginVersion.plugin)
     var versionHistory: [PluginVersion]
@@ -54,6 +56,12 @@ final class Plugin {
 
     var pathURL: URL {
         URL(fileURLWithPath: path)
+    }
+
+    /// Parsed functional category.
+    var category: PluginCategory {
+        get { PluginCategory(rawValue: categoryRaw) ?? .uncategorized }
+        set { categoryRaw = newValue.rawValue }
     }
 
     /// Parsed CPU architectures from the raw string.

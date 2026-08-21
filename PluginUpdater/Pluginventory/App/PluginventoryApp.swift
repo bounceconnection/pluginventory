@@ -61,6 +61,10 @@ struct PluginventoryApp: App {
                     exportCSV()
                 }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
+
+                Button("Export as PDF…") {
+                    exportPDF()
+                }
             }
 
             CommandGroup(before: .help) {
@@ -86,6 +90,18 @@ struct PluginventoryApp: App {
         guard panel.runModal() == .OK, let url = panel.url else { return }
         let csv = appState.exportPluginListCSV()
         try? csv.write(to: url, atomically: true, encoding: .utf8)
+    }
+
+    @MainActor
+    private func exportPDF() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.pdf]
+        panel.nameFieldStringValue = "plugins.pdf"
+        panel.prompt = "Export"
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        let data = appState.exportPluginInventoryPDFData()
+        try? data.write(to: url)
     }
 
     @MainActor

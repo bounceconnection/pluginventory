@@ -100,6 +100,7 @@ enum PersistenceController {
         ScanLocation.self,
         AbletonProject.self,
         AbletonProjectPlugin.self,
+        OffloadedPlugin.self,
     ])
 
     static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {

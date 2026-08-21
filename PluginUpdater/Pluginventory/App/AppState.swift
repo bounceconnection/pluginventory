@@ -31,6 +31,7 @@ final class AppState {
     private let appUpdateChecker = AppUpdateChecker()
     private let manifestCacheManager = ManifestCacheManager()
     private let bundleSizeService = BundleSizeService()
+    private let offloadManager = OffloadManager()
     private var prefetchTask: Task<Void, Never>?
     private var sizeComputationTask: Task<Void, Never>?
 
@@ -391,6 +392,27 @@ final class AppState {
         return csv
     }
 
+    /// Builds a multi-page PDF of the current plugin inventory.
+    func exportPluginInventoryPDFData() -> Data {
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<Plugin>(
+            predicate: #Predicate { !$0.isRemoved },
+            sortBy: [SortDescriptor(\.name)]
+        )
+        guard let plugins = try? context.fetch(descriptor) else { return Data() }
+        let rows = plugins.map { plugin in
+            PluginInventoryPDF.Row(
+                name: plugin.name,
+                vendor: plugin.vendorName,
+                format: plugin.format.displayName,
+                version: plugin.currentVersion,
+                category: plugin.category.displayName,
+                size: ByteCountFormatter.string(fromByteCount: plugin.fileSize, countStyle: .file)
+            )
+        }
+        return PluginInventoryPDF.generate(title: "Plugin Inventory", rows: rows, generatedAt: Date())
+    }
+
     // MARK: - Image Prefetching
 
     /// Cancels any running image prefetch task.
@@ -527,6 +549,66 @@ final class AppState {
         if changed {
             try? context.save()
             AppLogger.shared.info("Bundle sizes updated for \(plugins.count) plugins", category: "scan")
+        }
+    }
+
+    // MARK: - Offloading
+
+    /// Offloads the given plugins: moves each bundle into the offload folder,
+    /// records it for restore, and removes it from the active plugin list.
+    /// Returns how many succeeded and failed.
+    @discardableResult
+    func offloadPlugins(_ pluginsToOffload: [Plugin]) async -> (offloaded: Int, failed: Int) {
+        let context = modelContainer.mainContext
+        var offloaded = 0
+        var failed = 0
+        for plugin in pluginsToOffload {
+            do {
+                let record = try await offloadManager.offload(bundleAt: plugin.pathURL)
+                let item = OffloadedPlugin(
+                    name: plugin.name,
+                    vendorName: plugin.vendorName,
+                    bundleIdentifier: plugin.bundleIdentifier,
+                    formatRaw: plugin.format.rawValue,
+                    originalPath: record.originalPath,
+                    offloadedPath: record.offloadedPath,
+                    sizeBytes: record.sizeBytes,
+                    offloadedAt: record.offloadedAt
+                )
+                context.insert(item)
+                context.delete(plugin)
+                offloaded += 1
+            } catch {
+                failed += 1
+                AppLogger.shared.error("Offload failed for \(plugin.name): \(error.localizedDescription)", category: "offload")
+            }
+        }
+        try? context.save()
+        if failed > 0 {
+            errorMessage = "\(failed) plugin(s) could not be offloaded"
+        }
+        let countDescriptor = FetchDescriptor<Plugin>(predicate: #Predicate { !$0.isRemoved })
+        totalPluginCount = (try? context.fetchCount(countDescriptor)) ?? totalPluginCount
+        return (offloaded, failed)
+    }
+
+    /// Restores previously offloaded plugins to their original locations, then rescans.
+    func restoreOffloaded(_ items: [OffloadedPlugin]) async {
+        let context = modelContainer.mainContext
+        var restored = 0
+        for item in items {
+            do {
+                try await offloadManager.restore(item.offloadRecord)
+                context.delete(item)
+                restored += 1
+            } catch {
+                errorMessage = "Restore failed: \(error.localizedDescription)"
+                AppLogger.shared.error("Restore failed for \(item.name): \(error.localizedDescription)", category: "offload")
+            }
+        }
+        try? context.save()
+        if restored > 0 {
+            await performScan()
         }
     }
 

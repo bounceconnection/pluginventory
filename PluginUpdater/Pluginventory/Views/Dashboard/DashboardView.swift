@@ -11,6 +11,11 @@ enum SidebarFilter: Hashable {
     case projectsMissingPlugins
     case usedPlugins
     case unusedPlugins
+    case category(PluginCategory)
+    case duplicates
+    case rosettaRisk
+    case offloaded
+    case manufacturer(String)
 }
 
 /// Wraps a Plugin with its computed update status so the Table can sort all columns.
@@ -55,8 +60,14 @@ private struct SidebarCounts {
     var projectsMissingPlugins = 0
     var usedPlugins = 0
     var unusedPlugins = 0
+    var categoryCounts: [PluginCategory: Int] = [:]
+    var manufacturerCounts: [String: Int] = [:]
+    var duplicates = 0
+    var rosettaRisk = 0
 
     func count(for format: PluginFormat) -> Int { formatCounts[format, default: 0] }
+    func count(for category: PluginCategory) -> Int { categoryCounts[category, default: 0] }
+    func count(forManufacturer name: String) -> Int { manufacturerCounts[name, default: 0] }
 }
 
 @MainActor
@@ -66,6 +77,7 @@ struct DashboardView: View {
     @Query(filter: #Predicate<Plugin> { !$0.isRemoved }) private var plugins: [Plugin]
     @Query(filter: #Predicate<AbletonProject> { !$0.isRemoved })
     private var abletonProjects: [AbletonProject]
+    @Query private var offloadedPlugins: [OffloadedPlugin]
     @State private var sidebarSelection: SidebarFilter = .all
     @State private var searchText = ""
     @State private var debouncedSearchText = ""
@@ -74,6 +86,8 @@ struct DashboardView: View {
     @State private var selectedPluginIDs: Set<PersistentIdentifier> = []
     @State private var showInspector = false
     @State private var selectedProjectForDetail: AbletonProject?
+    @State private var showInsights = false
+    @State private var pendingOffloadIDs: Set<PersistentIdentifier>?
 
     /// Maps persisted column name strings to their KeyPathComparator.
     private static let pluginColumnMap: [String: PartialKeyPath<PluginRow>] = [
@@ -123,7 +137,7 @@ struct DashboardView: View {
     // MARK: - Computed helpers
 
     /// Single-pass sidebar counts — replaces 6+ separate filter iterations.
-    private func computeSidebarCounts(manifest: [String: UpdateManifestEntry]) -> SidebarCounts {
+    private func computeSidebarCounts(manifest: [String: UpdateManifestEntry], duplicateReport: DuplicateReport) -> SidebarCounts {
         var c = SidebarCounts()
         for plugin in plugins {
             if plugin.isHidden {
@@ -131,6 +145,14 @@ struct DashboardView: View {
             } else {
                 c.visible += 1
                 c.formatCounts[plugin.format, default: 0] += 1
+                c.categoryCounts[plugin.category, default: 0] += 1
+                c.manufacturerCounts[plugin.vendorName, default: 0] += 1
+                if ArchitectureCompatibility.breaksInMacOS28(plugin.architectures) {
+                    c.rosettaRisk += 1
+                }
+                if duplicateReport.duplicatePaths.contains(plugin.path) {
+                    c.duplicates += 1
+                }
                 if let entry = manifest[plugin.bundleIdentifier],
                    !entry.latestVersion.isEmpty,
                    entry.latestVersion.isNewerVersion(than: plugin.currentVersion) {
@@ -162,7 +184,7 @@ struct DashboardView: View {
     }
 
     /// Filtered + sorted rows for the Table, computed once per body evaluation.
-    private func computeRows(manifest: [String: UpdateManifestEntry], projectCounts: [String: Int], instanceCounts: [String: Int]) -> [PluginRow] {
+    private func computeRows(manifest: [String: UpdateManifestEntry], projectCounts: [String: Int], instanceCounts: [String: Int], duplicateReport: DuplicateReport) -> [PluginRow] {
         var result = plugins
 
         if sidebarSelection == .hidden {
@@ -188,7 +210,15 @@ struct DashboardView: View {
             case .unusedPlugins:
                 let usedNames = collectUsedPluginNames()
                 result = result.filter { !usedNames.contains($0.name.lowercased()) }
-            case .allProjects, .projectsMissingPlugins:
+            case .category(let category):
+                result = result.filter { $0.category == category }
+            case .duplicates:
+                result = result.filter { duplicateReport.duplicatePaths.contains($0.path) }
+            case .rosettaRisk:
+                result = result.filter { ArchitectureCompatibility.breaksInMacOS28($0.architectures) }
+            case .manufacturer(let name):
+                result = result.filter { $0.vendorName == name }
+            case .allProjects, .projectsMissingPlugins, .offloaded:
                 break
             }
         }
@@ -326,14 +356,150 @@ struct DashboardView: View {
         return (projectCounts, instanceCounts)
     }
 
+    /// Builds the duplicate report over currently-visible (non-hidden) plugins.
+    private func computeDuplicateReport() -> DuplicateReport {
+        let inputs = plugins.compactMap { plugin -> DuplicatePluginInput? in
+            plugin.isHidden ? nil : DuplicatePluginInput(
+                name: plugin.name,
+                vendorName: plugin.vendorName,
+                bundleIdentifier: plugin.bundleIdentifier,
+                format: plugin.format,
+                path: plugin.path
+            )
+        }
+        return DuplicateDetector().analyze(inputs)
+    }
+
+    /// Builds insights analytics data over currently-visible (non-hidden) plugins.
+    private func buildInsightsData() -> InsightsData {
+        let inputs = plugins.compactMap { plugin -> InsightPlugin? in
+            plugin.isHidden ? nil : InsightPlugin(
+                name: plugin.name,
+                vendorName: plugin.vendorName,
+                format: plugin.format,
+                category: plugin.category,
+                fileSize: plugin.fileSize
+            )
+        }
+        return InsightsData.build(from: inputs)
+    }
+
+    private func categoryIcon(_ category: PluginCategory) -> String {
+        switch category {
+        case .synth, .sampler: return "pianokeys"
+        case .drums: return "metronome"
+        case .eq, .filter: return "slider.horizontal.3"
+        case .dynamics, .compressor: return "waveform.path"
+        case .saturation, .distortion: return "flame"
+        case .reverb, .delay: return "wave.3.right"
+        case .modulation, .creative: return "sparkles"
+        case .pitch: return "tuningfork"
+        case .mastering, .channelStrip: return "slider.vertical.3"
+        case .metering, .analyzer: return "waveform"
+        case .utility: return "wrench.and.screwdriver"
+        case .guitarAmp: return "guitars"
+        case .noiseReduction: return "speaker.slash"
+        case .uncategorized: return "square.dashed"
+        }
+    }
+
+    private var offloadDialogTitle: String {
+        let n = pendingOffloadIDs?.count ?? 0
+        return "Offload \(n) plugin\(n == 1 ? "" : "s")?"
+    }
+
+    @ViewBuilder
+    private func manufacturersSection(_ counts: SidebarCounts) -> some View {
+        let ranked = counts.manufacturerCounts
+            .sorted { $0.value != $1.value ? $0.value > $1.value : $0.key < $1.key }
+            .map { $0.key }
+        if !ranked.isEmpty {
+            Section("Manufacturers") {
+                ForEach(ranked, id: \.self) { name in
+                    Label("\(name) (\(counts.count(forManufacturer: name)))", systemImage: "building.2")
+                        .tag(SidebarFilter.manufacturer(name))
+                }
+            }
+        }
+    }
+
+    private func buildVendorUpdateGroups(manifest: [String: UpdateManifestEntry]) -> [VendorUpdateGroup] {
+        var byVendor: [String: [UpdateRowInfo]] = [:]
+        for plugin in plugins where !plugin.isHidden {
+            guard let entry = manifest[plugin.bundleIdentifier],
+                  !entry.latestVersion.isEmpty,
+                  entry.latestVersion.isNewerVersion(than: plugin.currentVersion) else { continue }
+            if !debouncedSearchText.isEmpty,
+               !(plugin.name.localizedCaseInsensitiveContains(debouncedSearchText) ||
+                 plugin.vendorName.localizedCaseInsensitiveContains(debouncedSearchText)) {
+                continue
+            }
+            let info = UpdateRowInfo(
+                id: plugin.path,
+                name: plugin.name,
+                currentVersion: plugin.currentVersion,
+                availableVersion: entry.latestVersion,
+                downloadURL: entry.downloadURL,
+                architectures: plugin.architectures
+            )
+            byVendor[plugin.vendorName, default: []].append(info)
+        }
+        return byVendor
+            .map { VendorUpdateGroup(id: $0.key, vendor: $0.key, rows: $0.value.sorted { $0.name < $1.name }) }
+            .sorted { $0.vendor.lowercased() < $1.vendor.lowercased() }
+    }
+
+    @ViewBuilder
+    private func updatesGroupedDetail(manifest: [String: UpdateManifestEntry]) -> some View {
+        UpdatesGroupedView(groups: buildVendorUpdateGroups(manifest: manifest))
+            .toolbar { pluginTableToolbar() }
+    }
+
+    private var offloadedSizeDisplay: String {
+        let total = offloadedPlugins.reduce(Int64(0)) { $0 + $1.sizeBytes }
+        return ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
+    }
+
+    @ViewBuilder
+    private func offloadedListDetail() -> some View {
+        List {
+            Section {
+                ForEach(offloadedPlugins.sorted { $0.offloadedAt > $1.offloadedAt }) { item in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.name)
+                            Text("\(item.vendorName) · \(item.format?.displayName ?? "") · \(item.sizeDisplay)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Restore") {
+                            Task { await appState.restoreOffloaded([item]) }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(.vertical, 2)
+                }
+            } header: {
+                Text("\(offloadedPlugins.count) offloaded · \(offloadedSizeDisplay) reclaimed")
+            }
+        }
+        .overlay {
+            if offloadedPlugins.isEmpty {
+                ContentUnavailableView("Nothing Offloaded", systemImage: "archivebox", description: Text("Right-click plugins and choose Offload to reclaim disk space."))
+            }
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
         // Compute once per body evaluation — reused by Table, overlay, and sidebar.
         let manifest = appState.manifestEntries
-        let counts = computeSidebarCounts(manifest: manifest)
+        let duplicateReport = computeDuplicateReport()
+        let counts = computeSidebarCounts(manifest: manifest, duplicateReport: duplicateReport)
         let usageData = computePluginUsageData()
-        let rows = computeRows(manifest: manifest, projectCounts: usageData.projects, instanceCounts: usageData.instances)
+        let rows = computeRows(manifest: manifest, projectCounts: usageData.projects, instanceCounts: usageData.instances, duplicateReport: duplicateReport)
 
         NavigationSplitView {
             List(selection: $sidebarSelection) {
@@ -350,9 +516,38 @@ struct DashboardView: View {
                             .tag(SidebarFilter.format(format))
                     }
                 }
+                if counts.rosettaRisk > 0 {
+                    Section("Compatibility") {
+                        Label("Won't run in macOS 28 (\(counts.rosettaRisk))", systemImage: "exclamationmark.triangle.fill")
+                            .tag(SidebarFilter.rosettaRisk)
+                            .foregroundStyle(.orange)
+                    }
+                }
+                Section("Categories") {
+                    ForEach(PluginCategory.allCases) { category in
+                        let categoryCount = counts.count(for: category)
+                        if categoryCount > 0 {
+                            Label("\(category.displayName) (\(categoryCount))", systemImage: categoryIcon(category))
+                                .tag(SidebarFilter.category(category))
+                        }
+                    }
+                }
+                manufacturersSection(counts)
+                if counts.duplicates > 0 {
+                    Section("Cleanup") {
+                        Label("Duplicates (\(counts.duplicates))", systemImage: "square.on.square")
+                            .tag(SidebarFilter.duplicates)
+                    }
+                }
                 Section("Manage") {
                     Label("Hidden (\(counts.hidden))", systemImage: "eye.slash")
                         .tag(SidebarFilter.hidden)
+                }
+                if !offloadedPlugins.isEmpty {
+                    Section("Storage") {
+                        Label("Offloaded (\(offloadedPlugins.count)) · \(offloadedSizeDisplay) saved", systemImage: "archivebox")
+                            .tag(SidebarFilter.offloaded)
+                    }
                 }
                 if counts.totalProjects > 0 || appState.isProjectScanning || !appState.projectScanDirectories().isEmpty {
                     Section("Projects") {
@@ -391,8 +586,12 @@ struct DashboardView: View {
                 projectListDetail(
                     projects: abletonProjects.filter { $0.missingPluginCount > 0 }
                 )
+            case .offloaded:
+                offloadedListDetail()
+            case .updatesAvailable:
+                updatesGroupedDetail(manifest: manifest)
             default:
-                pluginTableDetail(rows: rows, manifest: manifest)
+                pluginTableDetail(rows: rows, manifest: manifest, rosettaRiskCount: counts.rosettaRisk)
             }
         }
         .frame(minWidth: 700, minHeight: 400)
@@ -457,7 +656,48 @@ struct DashboardView: View {
     // MARK: - Plugin Table Detail
 
     @ViewBuilder
-    private func pluginTableDetail(rows: [PluginRow], manifest: [String: UpdateManifestEntry]) -> some View {
+    private func pluginTableDetail(rows: [PluginRow], manifest: [String: UpdateManifestEntry], rosettaRiskCount: Int) -> some View {
+        pluginTable(rows: rows, manifest: manifest)
+            .background(NSTableViewFinder.enableColumnAutoResize())
+            .id(sidebarSelection)
+            .safeAreaInset(edge: .top) {
+                rosettaBanner(rosettaRiskCount: rosettaRiskCount)
+            }
+            .safeAreaInset(edge: .bottom) {
+                statusFooter(rowCount: rows.count)
+            }
+            .toolbar {
+                pluginTableToolbar()
+            }
+            .confirmationDialog(
+                offloadDialogTitle,
+                isPresented: offloadDialogBinding,
+                presenting: pendingOffloadIDs
+            ) { ids in
+                offloadDialogActions(ids)
+            } message: { _ in
+                Text("Selected bundles will be moved to ~/PluginventoryOffload to reclaim disk space. You can restore them anytime from the Offloaded list.")
+            }
+            .sheet(isPresented: $showInsights) {
+                NavigationStack {
+                    InsightsView(data: buildInsightsData())
+                }
+            }
+            .inspector(isPresented: $showInspector) {
+                inspectorContent()
+            }
+            .onChange(of: searchText) { _, newValue in
+                handleSearchChange(newValue)
+            }
+            .onChange(of: selectedPluginIDs) { _, newValue in
+                if !newValue.isEmpty {
+                    showInspector = true
+                }
+            }
+    }
+
+    @ViewBuilder
+    private func pluginTable(rows: [PluginRow], manifest: [String: UpdateManifestEntry]) -> some View {
         Table(rows, selection: $selectedPluginIDs, sortOrder: $sortOrder) {
             Group {
                 TableColumn("Name", value: \PluginRow.name) { (row: PluginRow) in
@@ -526,124 +766,166 @@ struct DashboardView: View {
                 .width(min: 50, ideal: 70, max: 90)
             }
         }
-        .background(NSTableViewFinder.enableColumnAutoResize())
-        .id(sidebarSelection)
         .contextMenu(forSelectionType: PersistentIdentifier.self) { ids in
-            if !ids.isEmpty {
-                let count = ids.count
-                Button("Copy Path\(count > 1 ? "s" : "")") {
-                    copyPaths(for: ids)
-                }
-                Button("Copy Full Details") {
-                    copyFullDetails(for: ids, manifest: manifest)
-                }
-
-                Divider()
-
-                Button("Reveal in Finder") {
-                    revealInFinder(ids: ids)
-                }
-                Button("Open Publisher Website") {
-                    openVendorWebsites(for: ids, manifest: manifest)
-                }
-
-                Divider()
-
-                if sidebarSelection == .hidden {
-                    Button("Unhide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
-                        setHidden(false, for: ids)
-                    }
-                } else {
-                    Button("Hide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
-                        setHidden(true, for: ids)
-                    }
-                }
-            }
+            rowContextMenu(ids, manifest: manifest)
         }
         .overlay {
-            if plugins.isEmpty && !appState.isScanning {
-                ContentUnavailableView("No Plugins Found", systemImage: "puzzlepiece.extension", description: Text("Run a scan to discover your audio plugins."))
-            } else if rows.isEmpty && !debouncedSearchText.isEmpty {
-                ContentUnavailableView.search(text: debouncedSearchText)
-            } else if rows.isEmpty && sidebarSelection == .hidden {
-                ContentUnavailableView("No Hidden Plugins", systemImage: "eye.slash", description: Text("Right-click a plugin and choose Hide to hide it here."))
+            tableEmptyOverlay(rows: rows)
+        }
+    }
+
+    @ViewBuilder
+    private func rowContextMenu(_ ids: Set<PersistentIdentifier>, manifest: [String: UpdateManifestEntry]) -> some View {
+        if !ids.isEmpty {
+            let count = ids.count
+            Button("Copy Path\(count > 1 ? "s" : "")") {
+                copyPaths(for: ids)
+            }
+            Button("Copy Full Details") {
+                copyFullDetails(for: ids, manifest: manifest)
+            }
+            Divider()
+            Button("Reveal in Finder") {
+                revealInFinder(ids: ids)
+            }
+            Button("Open Publisher Website") {
+                openVendorWebsites(for: ids, manifest: manifest)
+            }
+            Divider()
+            Button("Offload to Reclaim Space") {
+                pendingOffloadIDs = ids
+            }
+            Divider()
+            if sidebarSelection == .hidden {
+                Button("Unhide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
+                    setHidden(false, for: ids)
+                }
+            } else {
+                Button("Hide\(count > 1 ? " \(count) Plugins" : " Plugin")") {
+                    setHidden(true, for: ids)
+                }
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            HStack {
-                Text(statusBarText(rowCount: rows.count))
+    }
+
+    @ViewBuilder
+    private func tableEmptyOverlay(rows: [PluginRow]) -> some View {
+        if plugins.isEmpty && !appState.isScanning {
+            ContentUnavailableView("No Plugins Found", systemImage: "puzzlepiece.extension", description: Text("Run a scan to discover your audio plugins."))
+        } else if rows.isEmpty && !debouncedSearchText.isEmpty {
+            ContentUnavailableView.search(text: debouncedSearchText)
+        } else if rows.isEmpty && sidebarSelection == .hidden {
+            ContentUnavailableView("No Hidden Plugins", systemImage: "eye.slash", description: Text("Right-click a plugin and choose Hide to hide it here."))
+        }
+    }
+
+    @ViewBuilder
+    private func rosettaBanner(rosettaRiskCount: Int) -> some View {
+        if rosettaRiskCount > 0 && sidebarSelection != .rosettaRisk {
+            RosettaWarningBanner(count: rosettaRiskCount) {
+                sidebarSelection = .rosettaRisk
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func statusFooter(rowCount: Int) -> some View {
+        HStack {
+            Text(statusBarText(rowCount: rowCount))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+            if let lastRefresh = appState.lastManifestRefresh {
+                Text("Updates checked \(lastRefresh, format: .relative(presentation: .named))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Spacer()
-                if let lastRefresh = appState.lastManifestRefresh {
-                    Text("Updates checked \(lastRefresh, format: .relative(presentation: .named))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(.bar)
-        }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                if appState.isScanning {
-                    ProgressView(value: appState.scanProgress)
-                        .progressViewStyle(.circular)
-                        .controlSize(.regular)
-                } else {
-                    Button {
-                        Task { await appState.performScan() }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Text(statusSubtitle)
-                                .font(.caption)
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                    }
-                }
-            }
-            ToolbarItem(placement: .primaryAction) {
-                HStack(spacing: 8) {
-                    TextField("Search plugins or vendors", text: $searchText)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(minWidth: 180, idealWidth: 250)
-                    Button {
-                        showInspector.toggle()
-                    } label: {
-                        Label("Info", systemImage: "sidebar.trailing")
-                    }
-                    .labelStyle(.titleAndIcon)
-                }
             }
         }
-        .inspector(isPresented: $showInspector) {
-            if let plugin = selectedPlugin {
-                PluginDetailView(plugin: plugin, manifest: appState.manifestEntries)
-                    .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(.bar)
+    }
+
+    @ToolbarContentBuilder
+    private func pluginTableToolbar() -> some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            if appState.isScanning {
+                ProgressView(value: appState.scanProgress)
+                    .progressViewStyle(.circular)
+                    .controlSize(.regular)
             } else {
-                ContentUnavailableView("No Selection", systemImage: "cursorarrow.click", description: Text("Select a plugin to view its details."))
-                    .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
-            }
-        }
-        .onChange(of: searchText) { _, newValue in
-            searchTask?.cancel()
-            if newValue.isEmpty {
-                debouncedSearchText = ""
-            } else {
-                searchTask = Task {
-                    try? await Task.sleep(nanoseconds: 300_000_000)
-                    if !Task.isCancelled {
-                        debouncedSearchText = newValue
+                Button {
+                    Task { await appState.performScan() }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(statusSubtitle)
+                            .font(.caption)
+                        Image(systemName: "arrow.clockwise")
                     }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
                 }
             }
         }
-        .onChange(of: selectedPluginIDs) { _, newValue in
-            if !newValue.isEmpty {
-                showInspector = true
+        ToolbarItem(placement: .primaryAction) {
+            HStack(spacing: 8) {
+                TextField("Search plugins or vendors", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(minWidth: 180, idealWidth: 250)
+                Button {
+                    showInsights = true
+                } label: {
+                    Label("Insights", systemImage: "chart.bar.xaxis")
+                }
+                .labelStyle(.titleAndIcon)
+                Button {
+                    showInspector.toggle()
+                } label: {
+                    Label("Info", systemImage: "sidebar.trailing")
+                }
+                .labelStyle(.titleAndIcon)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func offloadDialogActions(_ ids: Set<PersistentIdentifier>) -> some View {
+        Button("Offload", role: .destructive) {
+            let toOffload = plugins(for: ids)
+            pendingOffloadIDs = nil
+            Task { await appState.offloadPlugins(toOffload) }
+        }
+        Button("Cancel", role: .cancel) { pendingOffloadIDs = nil }
+    }
+
+    private var offloadDialogBinding: Binding<Bool> {
+        Binding(
+            get: { pendingOffloadIDs != nil },
+            set: { if !$0 { pendingOffloadIDs = nil } }
+        )
+    }
+
+    @ViewBuilder
+    private func inspectorContent() -> some View {
+        if let plugin = selectedPlugin {
+            PluginDetailView(plugin: plugin, manifest: appState.manifestEntries)
+                .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+        } else {
+            ContentUnavailableView("No Selection", systemImage: "cursorarrow.click", description: Text("Select a plugin to view its details."))
+                .inspectorColumnWidth(min: 280, ideal: 320, max: 400)
+        }
+    }
+
+    private func handleSearchChange(_ newValue: String) {
+        searchTask?.cancel()
+        if newValue.isEmpty {
+            debouncedSearchText = ""
+        } else {
+            searchTask = Task {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                if !Task.isCancelled {
+                    debouncedSearchText = newValue
+                }
             }
         }
     }
